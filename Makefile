@@ -28,7 +28,7 @@ INC_PATH = -I$(srcdir) -I/usr/local/include -Iincludes
 LNK_LIBS = -L/usr/local/lib -lglfw -lGL -lGLU -lrt -pthread -ldl -lm -lc
 
 # other compilation options
-COMPILE_OPTS = -pthread `pkg-config --libs --cflags bullet`
+COMPILE_OPTS = -pthread
 
 # basic compiler warning options (for GOAL_EXE)
 BWARN_OPTS = 

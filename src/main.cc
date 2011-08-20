@@ -5,6 +5,7 @@
 #include <GL/glfw.h>
 
 #include <Eigen/Core>
+#include <Eigen/Geometry>
 #include <mesh/mesh.h>
 
 #include "solid.h"
@@ -32,7 +33,7 @@ Solid puzzle(
 	Vector3f( 10,  10,  10));
 
 IntrinsicCoordinate coord;
-Vector3f velocity(0.1, 0, 0);
+Vector3f velocity(0, 0, 0);
 
 void init() {
 	Level0		level_func;
@@ -105,7 +106,12 @@ void input() {
 
 
 void tick() {
-	velocity = coord.advect(velocity);
+
+	Quaternionf quat(vw, vx, vy, vz);
+
+	velocity += quat * Vector3f(0, 0, 0.1);
+	float m = velocity.norm();
+	velocity = coord.advect(velocity * 0.0001).normalized() * m * 0.995;
 }
 
 void draw() {
@@ -128,7 +134,7 @@ void draw() {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    glTranslated(-tx, -ty, -tz);
+	glTranslated(-tx, -ty, -tz);
 
     double m = sqrt(1. - vw*vw);
     if(m > 0.0001) {
@@ -139,6 +145,9 @@ void draw() {
             glRotated(180., vx, vy, vz);
         }
     }
+    
+   	glTranslated(-coord.position[0], -coord.position[1], -coord.position[2]);
+
     
     //Draw the level
     puzzle.draw();

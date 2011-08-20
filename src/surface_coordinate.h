@@ -111,10 +111,12 @@ struct IntrinsicCoordinate {
 		v_dir /= v_mag;
 		const float i_mag = v_mag;
 		
+		/*
 		cout << "Start advect:" << endl
 			 << "v = " << v << endl
 		     << "v_dir = " << v_dir << endl
 		     << "v_mag = " << v_mag << endl;
+		*/
 		
 		while(v_mag > 1e-8) {
 			//Calculate tangent space
@@ -124,6 +126,7 @@ struct IntrinsicCoordinate {
 					 dv = verts[1] - verts[0];			
 			Vector3f n = du.cross(dv).normalized();
 			
+			/*
 			cout << "Advecting: p = " << position << endl;
 			for(int i=0; i<3; ++i) {
 				cout << "v[" << i << "]=" << verts[i] << endl;
@@ -134,42 +137,44 @@ struct IntrinsicCoordinate {
 				cout << tri.v[i] << ',';
 			}
 			cout << endl;
+			*/
 			
 			//Transport velocity
 			Vector3f residual_velocity = v_dir * v_mag;
 			v_dir = (residual_velocity - n * n.dot(residual_velocity)).normalized();
 			residual_velocity = v_dir * v_mag;
 			
+			/*
 			cout << "Velocity direction = " << v_dir << endl 
 				 << "Velocity magnitude = " << v_mag << endl
 				 << "Velocity           = " << residual_velocity << endl;
-				
+			*/
 			
 			//Compute advected position in barycentric coordinates
 			Vector3f mu = barycentric(position + residual_velocity, n, du, dv, verts[0]),
 					 nu = barycentric(position, n, du, dv, verts[0]);
 			clamp_barycentric(nu);
+			
+			/*
 			cout << "mu = " << mu << endl
 				 << "nu = " << nu << endl;
+			*/
 			
 			//Find intersection with edge of triangle
 			Vector3f db = mu - nu;
 			
-			cout << "db = " << db << endl;
+			//cout << "db = " << db << endl;
 			float t = 1.f;
 			int last_edge = -1;
 			for(int i=0; i<3; ++i) {
 				int e = i;
-				
 				if(abs(nu[i]) <= 1e-6) {
 					nu[i] += 1e-6;
 				}
-				
 				if(abs(db[e]) > 1e-6 && nu[e] + t * db[e] < -1e-8) {
 					last_edge = e;
 					t = -nu[e] / db[e];
-					
-					cout << "Hit an edge: " << e << endl;
+					//cout << "Hit an edge: " << e << endl;
 				}
 			}
 			
@@ -183,10 +188,12 @@ struct IntrinsicCoordinate {
 			v_mag = max(0.f, v_mag - dposition);
 			position = nposition;
 			
+			/*
 			cout << "t = " << t << endl;
 			cout << "dposition = " << dposition << endl;
 			cout << "last_edge = " << last_edge << endl;
 			cout << "Barycentric intersection = " << b << endl;
+			*/
 			
 			//If we are still in the triangle, then we are done!
 			if(last_edge == -1) {
@@ -208,7 +215,7 @@ struct IntrinsicCoordinate {
 			}
 		}
 		
-		cout << "Done" << endl;
+		//cout << "Done" << endl;
 		
 		return v_dir * i_mag;
 	}
