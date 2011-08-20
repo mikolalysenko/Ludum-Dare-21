@@ -5,7 +5,6 @@
 #include <Eigen/Core>
 #include <GL/glfw.h>
 #include <mesh/mesh.h>
-#include "btBulletDynamicsCommon.h"
 #include "solid.h"
 
 using namespace std;
@@ -40,16 +39,6 @@ void Solid::setup_data() {
 	glDisableClientState(GL_COLOR_ARRAY);
     glEndList();	
 
-	//Update collision data
-	auto index_array = new btTriangleIndexVertexArray(
-		mesh.triangles().size(),
-		ibuffer,
-		3*sizeof(int),
-		mesh.vertices().size(),
-		(btScalar*)(void*)(&vbuffer[0].position),
-		sizeof(Vertex));
-	collision_shape = new btBvhTriangleMeshShape(index_array, true, true);
-	
 	//Update mass
 	mass = 0.0;
 	float J = 1.0 / (scale[0]*scale[1]*scale[2]);

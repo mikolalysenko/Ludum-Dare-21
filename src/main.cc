@@ -7,10 +7,9 @@
 #include <Eigen/Core>
 #include <mesh/mesh.h>
 
-#include "btBulletDynamicsCommon.h"
-
 #include "solid.h"
 #include "levels.h"
+#include "surface_coordinate.h"
 
 using namespace std;
 using namespace Eigen;
@@ -32,11 +31,19 @@ Solid puzzle(
 	Vector3f(-10, -10, -10),
 	Vector3f( 10,  10,  10));
 
+IntrinsicCoordinate coord;
+Vector3f velocity(0.1, 0, 0);
+
 void init() {
-	puzzle.init();
 	Level0		level_func;
 	Level0Attr	attr_func;
 	setup_solid(puzzle, level_func, attr_func);
+	
+	auto t = puzzle.mesh.triangle(0);
+	coord = IntrinsicCoordinate(
+		0,
+		puzzle.mesh.vertex(t.v[0]).position,
+		&puzzle.mesh);
 }
 
 void input() {
@@ -44,6 +51,18 @@ void input() {
     if( glfwGetKey(GLFW_KEY_ESC) == GLFW_PRESS || 
         !glfwGetWindowParam(GLFW_OPENED) ) {
         running = false;
+    }
+    
+    static int pressed = false;
+    
+    if( glfwGetKey('A') == GLFW_PRESS ) {
+    	if(!pressed) {
+    		velocity = coord.advect(velocity);
+    		pressed = true;
+    	}
+    }
+    else {
+    	pressed = false;
     }
     
     int w, h;
@@ -84,6 +103,11 @@ void input() {
     tz += (pz - mz) * 10;
 }
 
+
+void tick() {
+	velocity = coord.advect(velocity);
+}
+
 void draw() {
 
 	srand(time(NULL));
@@ -118,6 +142,12 @@ void draw() {
     
     //Draw the level
     puzzle.draw();
+    
+    glPointSize(5);
+    glColor3f(1, 0, 0);
+    glBegin(GL_POINTS);
+    glVertex3f(coord.position[0], coord.position[1], coord.position[2]);
+    glEnd();
 }
 
 };
@@ -134,6 +164,7 @@ int main(int argc, char* argv[]) {
     while(App::running) {
         App::input();
         App::draw();
+        App::tick();
         glfwSwapBuffers();
     }
 

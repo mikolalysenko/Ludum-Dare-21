@@ -1,6 +1,7 @@
 #ifndef SOLID_H
 #define SOLID_H
 
+#include <array>
 #include <vector>
 #include <iostream>
 #include <cmath>
@@ -8,7 +9,6 @@
 #include <GL/glfw.h>
 #include <Eigen/Core>
 #include <mesh/mesh.h>
-#include "btBulletDynamicsCommon.h"
 
 typedef Eigen::Transform<float, 3, Eigen::Affine> Transform3f;
 
@@ -22,12 +22,12 @@ struct Cell {
 };
 
 struct Solid {
+	const Eigen::Array3f scale;
 	const Eigen::Vector3i resolution;
 	const Eigen::Vector3f lower_bound, upper_bound;
 	std::vector<Cell> data;
 	Mesh::TriMesh<Vertex> mesh;
 	GLuint display_list;
-	btCollisionShape* collision_shape;
 	float mass;
 
 	Solid(
@@ -74,8 +74,7 @@ struct Solid {
 		return data[i + resolution[0]*(j + resolution[1]*k)];
 	}
 
-private:
-	const Eigen::Array3f scale;
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };
 
 //Reinitializes a puzzle with the given implicit function
