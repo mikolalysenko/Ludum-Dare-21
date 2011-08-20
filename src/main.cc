@@ -26,8 +26,9 @@ double vw=1., vx=0., vy=0., vz=0.;
 double tx = 0., ty=0., tz=100.;
 
 
-#define MAP_SIZE	256
-float terrain[MAP_SIZE][MAP_SIZE][MAP_SIZE];
+
+GLuint puzzle_display_list;
+
 
 void init() {
 

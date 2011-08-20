@@ -10,21 +10,27 @@
 #define MAP_SIZE		256
 #define NUM_CHUNKS		16
 
+struct TerrainVertex {
+	Eigen::Vector3f position, color;
+};
+
 struct CellValue {
 	char density;
 };
 
 struct Chunk {
 	bool dirty;
-	TriMesh<TerrainVertex>	mesh;
-	GLuint	display_list;
+	Mesh::TriMesh<TerrainVertex> mesh;
+	GLuint display_list;
 };
 
 struct World {
 	CellValue	terrain[MAP_SIZE][MAP_SIZE][MAP_SIZE];
 	Chunk		chunks[NUM_CHUNKS][NUM_CHUNKS][NUM_CHUNKS];
 
-	World();
+	World() {}
+	
+	void init();
 	
 	float operator()(Eigen::Vector3f const& v) const {
 		int 	iv[3];
@@ -45,14 +51,32 @@ struct World {
 		return t / 128.0;
 	}
 	
-	CellValue& cell(Eigen::Vector3i const& v) {
+	void set_cell(Eigen::Vector3i const& v, CellValue const& c) {
 		assert(v[0] >= 0 && v[1] >=0 && v[2] >= 0 &&
 			v[0] < MAP_SIZE && v[1] < MAP_SIZE && v[2] < MAP_SIZE);
-		return terrain[v[0]][v[1][v[2]];
+		terrain[v[0]][v[1][v[2]] = c;
+		chunks[v[0]/NUM_CHUNKS][v[1]/NUM_CHUNKS][v[2]/NUM_CHUNKS].dirty = true;
+	}
+	
+	CellValue get_cell(Eigen::Vector3i const& v) const {
+		assert(v[0] >= 0 && v[1] >=0 && v[2] >= 0 &&
+			v[0] < MAP_SIZE && v[1] < MAP_SIZE && v[2] < MAP_SIZE);
+		return terrain[v[0]][v[1][v[2]];	
 	}
 
+	Chunk& get_chunk(Eigen::Vector3i const& v) { 
+		assert(v[0] >= 0 && v[1] >=0 && v[2] >= 0 &&
+			v[0] < MAP_SIZE && v[1] < MAP_SIZE && v[2] < MAP_SIZE);	
+		Chunk& c = chunks[v[0]][v[1]][v[2]];
+		if(c.dirty) {
+			rebuild_chunk(c);
+		}
+		return c;
+	}
 	
-	
+private:
+	void generate_terrain();
+	void rebuild_chunk(Chunk& c);
 };
 
 #endif
