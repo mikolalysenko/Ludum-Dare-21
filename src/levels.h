@@ -1,0 +1,31 @@
+#ifndef LEVELS_H
+#define LEVELS_H
+
+#include "solid.h"
+
+struct Level0 {
+	Cell operator()(Eigen::Vector3f const& v) const {
+		using namespace Eigen;
+		
+		Cell result;
+		result.density = (v[0] * DENSITY_MAX);
+		return result;
+	}
+};
+
+struct Level0Attr {
+	Vertex operator()(Eigen::Vector3f const& v) const {
+		using namespace Eigen;
+		
+		Vertex result;
+		result.position = v;
+		result.normal = Vector3f(1, 0, 0);
+		result.color = v;
+		return result;
+	}
+};
+
+
+
+#endif
+

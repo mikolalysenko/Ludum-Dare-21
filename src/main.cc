@@ -5,10 +5,10 @@
 #include <GL/glfw.h>
 
 #include <Eigen/Core>
+#include <mesh/mesh.h>
 
-#include "mesh/mesh.h"
-
-#include "terrain.h"
+#include "solid.h"
+#include "levels.h"
 
 using namespace std;
 using namespace Eigen;
@@ -25,14 +25,15 @@ int mx=0, my=0, mz=0;
 double vw=1., vx=0., vy=0., vz=0.;
 double tx = 0., ty=0., tz=100.;
 
-
-
-GLuint puzzle_display_list;
-
+//Solid puzzle;
 
 void init() {
-
-
+/*
+	puzzle.init();
+	Level0		level_func;
+	Level0Attr	attr_func;
+	setup_solid(puzzle, Level0(), Level0Attr());
+*/
 }
 
 void input() {
@@ -110,7 +111,8 @@ void draw() {
         }
     }
     
-    //Draw stuff
+    //Draw the level
+    //glCallLists(puzzle.display_list);
 }
 
 };
