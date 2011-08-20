@@ -7,6 +7,8 @@
 #include <Eigen/Core>
 #include <mesh/mesh.h>
 
+#include "btBulletDynamicsCommon.h"
+
 #include "solid.h"
 #include "levels.h"
 

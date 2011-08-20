@@ -8,6 +8,9 @@
 #include <GL/glfw.h>
 #include <Eigen/Core>
 #include <mesh/mesh.h>
+#include "btBulletDynamicsCommon.h"
+
+typedef Eigen::Transform<float, 3, Eigen::Affine> Transform3f;
 
 struct Vertex {
 	Eigen::Vector3f	position, normal, color;
@@ -24,6 +27,8 @@ struct Solid {
 	std::vector<Cell> data;
 	Mesh::TriMesh<Vertex> mesh;
 	GLuint display_list;
+	btCollisionShape* collision_shape;
+	float mass;
 
 	Solid(
 		Eigen::Vector3i const& res,
@@ -35,9 +40,7 @@ struct Solid {
 		data(res[0]*res[1]*res[2]),
 		scale(Eigen::Array3f(res[0], res[1], res[2]) / (hi - lo).array()) {}
 
-	void init();
-	void reset();
-	void build_display_lists();
+	void setup_data();
 	void draw();
 	
 	float operator()(Eigen::Vector3f v) const {
@@ -79,8 +82,6 @@ private:
 template<typename ImplicitFunc_t, typename StyleFunc_t>
 void setup_solid(Solid& solid, ImplicitFunc_t& func, StyleFunc_t& style_func) {
 	using namespace Eigen;
-
-	solid.reset();
 	
 	//Fill in data
 	Cell* ptr = &solid.data[0];
@@ -100,8 +101,8 @@ void setup_solid(Solid& solid, ImplicitFunc_t& func, StyleFunc_t& style_func) {
 		solid.upper_bound,
 		solid.resolution );
 		
-	//Generate display stuff
-	solid.build_display_lists();
+	//Generate display/collision stuff
+	solid.setup_data();
 }
 
 #endif
