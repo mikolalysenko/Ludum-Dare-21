@@ -25,15 +25,16 @@ int mx=0, my=0, mz=0;
 double vw=1., vx=0., vy=0., vz=0.;
 double tx = 0., ty=0., tz=100.;
 
-//Solid puzzle;
+Solid puzzle(
+	Vector3i(16, 16, 16),
+	Vector3f(-10, -10, -10),
+	Vector3f( 10,  10,  10));
 
 void init() {
-/*
 	puzzle.init();
 	Level0		level_func;
 	Level0Attr	attr_func;
-	setup_solid(puzzle, Level0(), Level0Attr());
-*/
+	setup_solid(puzzle, level_func, attr_func);
 }
 
 void input() {
@@ -89,6 +90,8 @@ void draw() {
     glfwGetWindowSize(&w, &h);
     glViewport(0, 0, w, h);
 
+	glEnable(GL_DEPTH_TEST);
+
     glClearColor(0.3, 0.3, 0.8, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
@@ -112,7 +115,7 @@ void draw() {
     }
     
     //Draw the level
-    //glCallLists(puzzle.display_list);
+    puzzle.draw();
 }
 
 };

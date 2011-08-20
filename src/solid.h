@@ -9,15 +9,13 @@
 #include <Eigen/Core>
 #include <mesh/mesh.h>
 
-#define DENSITY_MAX			127.f
-
 struct Vertex {
 	Eigen::Vector3f	position, normal, color;
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 struct Cell {
-	char density;
+	float density;
 };
 
 struct Solid {
@@ -63,7 +61,7 @@ struct Solid {
 			t += cell(iv[0]+ix, iv[1]+iy, iv[2]+iz).density * w;
 		}
 		
-		return t / DENSITY_MAX;
+		return t;
 	}
 
 	Cell& cell(int i, int j, int k) {
@@ -104,8 +102,6 @@ void setup_solid(Solid& solid, ImplicitFunc_t& func, StyleFunc_t& style_func) {
 		
 	//Generate display stuff
 	solid.build_display_lists();
-	
-	std::cout << "Solid built" << std::endl;
 }
 
 #endif

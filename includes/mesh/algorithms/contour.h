@@ -62,8 +62,8 @@ void isocontour(
 		impl::ScopedArray<float> aguard(above), bguard(below);
 		
 		int idx = 0;
-		for(int y=0; y<=res[1]; ++y)
-		for(int x=0; x<=res[0]; ++x) {
+		for(int x=0; x<=res[0]; ++x)
+		for(int y=0; y<=res[1]; ++y) {
 			below[idx++] = f((Vector(x,y,0).array() * h + lo.array()).matrix());
 		}
 		

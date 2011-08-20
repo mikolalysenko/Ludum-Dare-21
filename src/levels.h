@@ -8,7 +8,7 @@ struct Level0 {
 		using namespace Eigen;
 		
 		Cell result;
-		result.density = (v[0] * DENSITY_MAX);
+		result.density = -(v[0] * v[1] * v[2]);
 		return result;
 	}
 };

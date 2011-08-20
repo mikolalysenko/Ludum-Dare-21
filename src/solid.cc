@@ -36,7 +36,6 @@ void Solid::build_display_lists() {
 	//Regenerate display list
 	glNewList(display_list, GL_COMPILE);
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
