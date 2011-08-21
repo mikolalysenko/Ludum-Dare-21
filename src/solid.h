@@ -18,7 +18,7 @@ struct Vertex {
 };
 
 struct Cell {
-	float density;
+	float density, friction;
 };
 
 struct Solid {
@@ -43,18 +43,26 @@ struct Solid {
 	void setup_data();
 	void draw();
 	
-	float operator()(Eigen::Vector3f v) const {
-		using namespace Eigen;
+	bool coordinate_parts(
+		Eigen::Vector3f v,
+		Eigen::Vector3i& iv,
+		Eigen::Vector3f& fv) const {
 		v = ((v - lower_bound).array() * scale).matrix();
-		
-		int 	iv[3];
-		float	fv[3];
 		for(int i=0; i<3; ++i) {
 			if(v[i] < 0 || v[i] >= resolution[i] - 1)
-				return -1.f;
+				return false;
 			iv[i] = v[i];
 			fv[i] = v[i] - iv[i];
 		}
+		return true;
+	}
+	
+	float operator()(Eigen::Vector3f const&v) const {
+		using namespace Eigen;
+		Vector3i iv;
+		Vector3f fv;
+		if(!coordinate_parts(v, iv, fv))
+			return -1.f;
 		
 		float t = 0.0f;
 		for(int ix=0; ix<2; ++ix)
@@ -64,6 +72,23 @@ struct Solid {
 			t += cell(iv[0]+ix, iv[1]+iy, iv[2]+iz).density * w;
 		}
 		
+		return t;
+	}
+	
+	float friction(Eigen::Vector3f const& v) const {
+		using namespace Eigen;
+		Vector3i iv;
+		Vector3f fv;
+		if(!coordinate_parts(v, iv, fv))
+			return 1.f;
+				
+		float t = 0.0f;
+		for(int ix=0; ix<2; ++ix)
+		for(int iy=0; iy<2; ++iy)
+		for(int iz=0; iz<2; ++iz) {
+			float w = fabsf((1.f-ix-fv[0])*(1.f-iy-fv[1])*(1.f-iz-fv[2]));
+			t += cell(iv[0]+ix, iv[1]+iy, iv[2]+iz).friction * w;
+		}
 		return t;
 	}
 
