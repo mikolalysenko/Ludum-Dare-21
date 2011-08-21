@@ -577,6 +577,10 @@ int simplex[95][112] = {
    -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
 };
 
+//the real X bounding box for a character is 26, but using that results in text that's too stretched. Set to 50 to compress the text a little bit
+#define TEXT_X_BOUNDS 50
+#define TEXT_Y_BOUNDS 32
+
 typedef struct _Character
 {
 	int width;
@@ -637,7 +641,7 @@ void start_text_rendering()
     glLoadIdentity();
 	
 	//this set of ortho bounds is based on the bounding box for the characters. So at 100% scale, the bounding box for a single character will fill the entire screen
-	gluOrtho2D(0, 26, 0, 32);
+	gluOrtho2D(0, TEXT_X_BOUNDS, 0, TEXT_Y_BOUNDS);
 	
 	glMatrixMode(GL_MODELVIEW);
 	
@@ -667,8 +671,7 @@ void show_text(const char* val, float x, float y, float size, int style)
 {
 	glPushMatrix();
 	
-	//26 and 32 come from the outer bounds of the bounding box of the characters
-	glTranslatef(26 * x, 32 * y, 0);
+	glTranslatef(TEXT_X_BOUNDS * x, TEXT_Y_BOUNDS * y, 0);
 	glScalef(size, size, size);
 	
 	//if it's bold, set a thicker line width
@@ -701,6 +704,7 @@ void show_text(const char* val, float x, float y, float size, int style)
 	glPopMatrix();
 }
 
+//calculates the width of the text on the screen
 float text_width(const char* val, float size)
 {
 	int fixedwidth = 0;
@@ -716,7 +720,7 @@ float text_width(const char* val, float size)
 		index++;
 	}
 	
-	return (((float)fixedwidth) * size) / 26.0;
+	return (((float)fixedwidth) * size) / TEXT_X_BOUNDS;
 }
 
 //this is the "get it done" version. This could be made a lot faster with vertex arrays, but I am looking for something that is quick to code
