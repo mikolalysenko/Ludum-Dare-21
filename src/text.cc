@@ -1,27 +1,8 @@
-#include <iostream>
-#include <cstdlib>
-#include <cstdio>
-#include <cmath>
-#include <GL/glfw.h>
-
-#include <Eigen/Core>
-#include <Eigen/Geometry>
-#include <mesh/mesh.h>
-
-#include "solid.h"
-#include "surface_coordinate.h"
-#include "particle.h"
-#include "player.h"
-#include "sound.h"
 #include "text.h"
 
-#include "levels/level0.h"
+#include <GL/glfw.h>
 
-using namespace std;
-using namespace Eigen;
-using namespace Mesh;
-
-namespace App {
+#include <stdio.h>
 
 int simplex[95][112] = {
     0,16, /* Ascii 32 */
@@ -596,161 +577,163 @@ int simplex[95][112] = {
    -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
 };
 
-	
-bool running = true;
-
-GLuint scene_display_list = 0;
-double fov=45., znear=1., zfar=1000.;
-
-//vector<Particle> particles;
-
-Player player;
-Puzzle puzzle;
-
-void init() {
-	
-	//initialize text stuff
-	initialize_text();
-	
-	//initialize level data
-	Level0::Level0 level_gen;
-	setup_puzzle(puzzle, level_gen, &player);
-	
-	/*
-	//Generate a bunch of random particles
-	for(int i=0; i<100; ++i) {
-		int t = rand() % puzzle.mesh.triangles().size();
-		particles.push_back(
-			Particle(
-				IntrinsicCoordinate(t,
-					puzzle.mesh.vertex(puzzle.mesh.triangle(t).v[rand()%3]).position,
-					&puzzle),
-				10.*Vector3f(0.5-drand48(), 0.5-drand48(), 0.5-drand48()),
-				Vector3f(drand48(), drand48(), drand48()),
-				(float)(drand48()*10.f) ));
-	}
-	*/
-	
-	//TODO: Create the player
-}
-
-void input() {
-
-    if( glfwGetKey(GLFW_KEY_ESC) == GLFW_PRESS || 
-        !glfwGetWindowParam(GLFW_OPENED) ) {
-        running = false;
-    }
-    
-    player.input();
-}
-
-void tick() {
-	static double last_t = 0.0;
-	auto t = glfwGetTime();
-	auto dt = t - last_t;
-	last_t = t;
-
-	/*
-	for(int i=0; i<particles.size(); ++i) {
-		particles[i].integrate(dt);
-	}
-	*/
-		
-	player.tick(dt);
-	puzzle.tick(dt);
-}
-
-void draw() {
-
-	srand(time(NULL));
-
-    int w, h;
-    glfwGetWindowSize(&w, &h);
-    glViewport(0, 0, w, h);
-
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CW);
-
-    glClearColor(0.3, 0.3, 0.8, 1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    //Set up projection matrix
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(fov, (float)w / (float)h, znear, zfar);
-    
-    glMatrixMode(GL_MODELVIEW);
-    
-  	//Set camera
-    player.set_gl_matrix();
-    
-    //Draw the level
-    puzzle.draw();
-    
-    //Draw the player
-    player.draw();
-    
-	start_text_rendering();
-	
-	show_text("Normal Text!", 0, 0, 0.05, TEXT_STYLE_NORMAL);
-	show_text("Bold Text!", 0, 0.05, 0.05, TEXT_STYLE_BOLD);
-	show_text("Italic Text!", 0, 0.1, 0.05, TEXT_STYLE_ITALIC);
-	show_text("Bold and Italic Text!", 0, 0.15, 0.05, TEXT_STYLE_BOLD_AND_ITALIC);
-	show_text("Small Text!", 0, 0.2, 0.02);
-	show_text("Big Text!", 0, 0.22, 0.08);
-	
-	show_text("Right Text!", 1 - text_width("Right Text!", 0.05), .5, 0.05, TEXT_STYLE_NORMAL);
-	show_text("Center Text!", (1 - text_width("Center Text!", 0.05)) / 2, .95, 0.05, TEXT_STYLE_NORMAL);
-	
-	end_text_rendering();
-    /*
-    //Draw particles
-    glPointSize(5);
-    glBegin(GL_POINTS);
-    for(int i=0; i<particles.size(); ++i) {
-    	auto p = particles[i];
-    	glColor3f(p.color[0], p.color[1], p.color[2]);
-	    glVertex3f(p.coordinate.position[0], p.coordinate.position[1], p.coordinate.position[2]);
-	}
-    glEnd();
-    */
-}
-
-
-};
-
-int initialize_libs()
+typedef struct _Character
 {
-    glfwInit();
-    if (!glfwOpenWindow(800, 600, 8, 8, 8, 8, 16, 0, GLFW_WINDOW))
-        return 0;
+	int width;
+	GLuint displaylist;
+} Character;
 
-	if(!initialize_sound_driver())
-		return 0;
-	
-	return 1;
-}
+Character chars[95];
 
-int main(int argc, char* argv[])
+void draw_char(int index)
 {
-	if(!initialize_libs())
+	//determins if we are inside a glBegin(GL_LINE_STRIP)
+	bool instrip = false;
+	
+	for(int x = 0; x < simplex[index][0]; x++)
 	{
-		glfwTerminate();
-		return -1;
+		//get coordinate data
+		int xp = simplex[index][(x+1)*2];
+		int yp = simplex[index][(x+1)*2 + 1];
+		
+		//-1, -1 indicates a pen move operation. So if it's not -1, -1, draw the vertex. Otherwise, end the strip so we can start a new line.
+		if(xp != -1 || yp != -1)
+		{
+			if(!instrip)
+			{
+				glBegin(GL_LINE_STRIP);
+				instrip = true;
+			}
+			
+			//this +7 exists because the bounding box for characters is (0, -7) - (26, 25). But I want it to be (0, 0) - (26, 32) so that both minimums will be 0 (useful when positioning text on screen).
+			glVertex2i(xp, yp + 7);
+		}
+		else
+		{
+			if(instrip)
+			{
+				instrip = false;
+				glEnd();
+			}
+		}
 	}
-	
-    glfwSetWindowTitle("Mesh Demo");
-    
-    App::init();
-    while(App::running) {
-        App::input();
-        App::draw();
-        App::tick();
-        glfwSwapBuffers();
-    }
 
-    glfwTerminate();
-    return 0;
+	if(instrip)
+		glEnd();
+	
+	return;
 }
 
+void start_text_rendering()
+{
+	//keep whatever rendering attributes were set up before
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
+	
+	glMatrixMode(GL_PROJECTION);
+	
+	//hold on to the old projection matrix to make this code less intrusive
+	glPushMatrix();
+	
+    glLoadIdentity();
+	
+	//this set of ortho bounds is based on the bounding box for the characters. So at 100% scale, the bounding box for a single character will fill the entire screen
+	gluOrtho2D(0, 26, 0, 32);
+	
+	glMatrixMode(GL_MODELVIEW);
+	
+	//hold onto old modelview matrix
+	glPushMatrix();
+	
+	glLoadIdentity();
+	
+	//set up rendering parameters for text
+	glDisable(GL_DEPTH_TEST);  //don't let the depth buffer get in the way of text
+	glDisable(GL_LINE_SMOOTH);  //don't antialias lines, since this is text, and not smoothing the lines will make it readable at a smaller size
+}
+
+void end_text_rendering()
+{
+	//restore all the stuff we set in start_text_rendering
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+	
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	
+	glPopAttrib();
+}
+
+void show_text(const char* val, float x, float y, float size, int style)
+{
+	glPushMatrix();
+	
+	//26 and 32 come from the outer bounds of the bounding box of the characters
+	glTranslatef(26 * x, 32 * y, 0);
+	glScalef(size, size, size);
+	
+	//if it's bold, set a thicker line width
+	if(style & 1)
+		glLineWidth(3);
+	else
+		glLineWidth(1);
+	
+	//if it's italic, multiply by a shear matrix
+	if(style & 2)
+	{
+		float mat[] = {1, 0, 0, 0, .25, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+		glMultMatrixf(mat);
+	}
+	
+	int index = 0;
+	while(val[index] != '\0')
+	{
+		int idx = val[index];
+		idx -= 32;
+		if(idx < 95)
+		{
+			glCallList(chars[idx].displaylist);
+			glTranslatef(chars[idx].width, 0, 0);
+		}
+		
+		index++;
+	}
+	
+	glPopMatrix();
+}
+
+float text_width(const char* val, float size)
+{
+	int fixedwidth = 0;
+	
+	int index = 0;
+	while(val[index] != '\0')
+	{
+		int idx = val[index];
+		idx -= 32;
+		if(idx < 95)
+			fixedwidth += chars[idx].width;
+		
+		index++;
+	}
+	
+	return (((float)fixedwidth) * size) / 26.0;
+}
+
+//this is the "get it done" version. This could be made a lot faster with vertex arrays, but I am looking for something that is quick to code
+void initialize_text()
+{
+	GLuint list = glGenLists(95);
+	
+	for(int x = 0; x < 95; x++)
+	{
+		glNewList(list, GL_COMPILE);
+		
+		draw_char(x);
+		
+		glEndList();
+		
+		chars[x].width = simplex[x][1];
+		chars[x].displaylist = list;
+		list++;
+	}
+}
