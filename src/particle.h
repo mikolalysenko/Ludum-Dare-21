@@ -3,13 +3,15 @@
 
 #include <vector>
 #include <Eigen/Core>
+#include <Eigen/Geometry>
 #include "solid.h"
 #include "surface_coordinate.h"
 
 struct Particle {
 	IntrinsicCoordinate coordinate;
 	Eigen::Vector3f velocity, forces, color;
-	float mass;
+	Eigen::Quaternionf rotation;
+	float mass, radius;
 	
 	Particle(){}
 	Particle(Particle const& p) :
@@ -17,23 +19,31 @@ struct Particle {
 		velocity(p.velocity),
 		forces(p.forces),
 		color(p.color),
-		mass(p.mass) {}
+		rotation(p.rotation),
+		mass(p.mass),
+		radius(p.radius) {}
 	Particle(
 		IntrinsicCoordinate const& coord,
 		Eigen::Vector3f const& v,
 		Eigen::Vector3f const& c,
-		float m) :
+		Eigen::Quaternionf const& rot,
+		float m,
+		float r) :
 		coordinate(coord),
 		velocity(v),
 		forces(0,0,0),
 		color(c),
-		mass(m) {}
+		rotation(rot),
+		mass(m),
+		radius(r) {}
 	Particle& operator=(Particle const& p) {
 		coordinate = p.coordinate;
 		velocity = p.velocity;
 		forces = p.forces;
 		color = p.color;
+		rotation = p.rotation;
 		mass = p.mass;
+		radius = p.radius;
 		return *this;
 	}
 	
@@ -51,9 +61,16 @@ struct Particle {
 		if(coordinate.solid) {
 			velocity *= exp(-delta_t * coordinate.friction());
 		}
+		float mag = velocity.norm();
+		
+		//Integrate rotation
+		if(mag > 1e-8) {
+			Vector3f normal = coordinate.interpolated_normal();
+			AngleAxisf rot(mag*delta_t, normal.cross(velocity).normalized());
+			rotation = rot * rotation;
+		}
 		
 		//Integrate position
-		float mag = velocity.norm();
 		velocity = coordinate.advect(velocity * delta_t).normalized() * mag;
 	}
 	

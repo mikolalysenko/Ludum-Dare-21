@@ -41,6 +41,8 @@ void Player::reset() {
 	particle.velocity = Vector3f(1, 0, 0);
 	particle.forces = Vector3f(0, 0, 0);
 	particle.color = Vector3f(1, 1, 1);
+	particle.rotation = Quaternionf(1, 0, 0, 0);
+	particle.radius = 0.5f;
 	particle.mass = 1.0f;
 	camera_stiffness = 5.0;
 	camera_distance = 3.0;
@@ -199,7 +201,10 @@ void Player::draw() {
 	*/
 
 	glPushMatrix();
-	glTranslatef(p[0]+n[0], p[1]+n[1], p[2]+n[2]);
+	auto c = p + n * particle.radius;
+	auto rot = AngleAxisf(particle.rotation);
+	glTranslatef(c[0], c[1], c[2]);
+	glRotatef(rot.angle() * (180./M_PI), rot.axis()[0], rot.axis()[1], rot.axis()[2]);
 	model->draw();
 	glPopMatrix();
 	
