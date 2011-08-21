@@ -15,8 +15,7 @@
 #include "sound.h"
 #include "text.h"
 #include "menu.h"
-
-#include "player_model.h"
+#include "art.h"
 
 #include "levels/level0.h"
 
@@ -33,11 +32,6 @@ GLuint scene_display_list = 0;
 double fov=45., znear=1., zfar=1000.;
 
 //vector<Particle> particles;
-
-Solid player_model(
-	Vector3i(16, 16, 16),
-	Vector3f(-1,-1,-1),
-	Vector3f( 1, 1, 1));
 Player player;
 Puzzle puzzle;
 	
@@ -84,6 +78,9 @@ void init()
 {
 	//initialize random seed
 	srand(time(NULL));
+	
+	//Initialize artwork
+	init_artwork();
 	
 	//initialize text stuff
 	initialize_text();
@@ -134,12 +131,6 @@ void init()
 	//TODO: in the future, this should be "showmenu(mainmenu)". Right now, I am defaulting it to just jump right into the game to make development easier (so you don't have to go through menus to test)
 	showmenu(NULL);
 
-	//Create player model
-	PlayerModelFunc player_func;
-	PlayerStyleFunc player_attr;
-	setup_solid(player_model, player_func, player_attr);
-	player.model = &player_model;
-	
 	//initialize level data
 	Level0::Level0 level_gen;
 	setup_puzzle(puzzle, level_gen, &player);
@@ -318,7 +309,7 @@ void draw() {
 int initialize_libs()
 {
     glfwInit();
-    if (!glfwOpenWindow(800, 600, 8, 8, 8, 8, 16, 0, GLFW_WINDOW))
+    if (!glfwOpenWindow(640,480, 8, 8, 8, 8, 16, 0, GLFW_WINDOW))
         return 0;
 
 	if(!initialize_sound_driver())
