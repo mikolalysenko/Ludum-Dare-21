@@ -14,6 +14,8 @@
 #include "player.h"
 #include "sound.h"
 
+#include "player_model.h"
+
 #include "levels/level0.h"
 
 using namespace std;
@@ -29,10 +31,19 @@ double fov=45., znear=1., zfar=1000.;
 
 //vector<Particle> particles;
 
+Solid player_model(
+	Vector3i(16, 16, 16),
+	Vector3f(-1,-1,-1),
+	Vector3f( 1, 1, 1));
 Player player;
 Puzzle puzzle;
 
 void init() {
+	PlayerModelFunc player_func;
+	PlayerStyleFunc player_attr;
+	setup_solid(player_model, player_func, player_attr);
+	player.model = &player_model;
+
 	Level0::Level0 level_gen;
 	setup_puzzle(puzzle, level_gen, &player);
 	
@@ -50,8 +61,6 @@ void init() {
 				(float)(drand48()*10.f) ));
 	}
 	*/
-	
-	//TODO: Create the player
 }
 
 void input() {

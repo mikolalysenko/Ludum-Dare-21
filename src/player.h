@@ -10,6 +10,9 @@
 #include "particle.h"
 
 struct Player {
+	//Player model
+	Solid* model;
+
 	//Camera parameters
 	float camera_stiffness, camera_distance, camera_height;
 	Eigen::Vector3f		camera_position, camera_up, target_position;

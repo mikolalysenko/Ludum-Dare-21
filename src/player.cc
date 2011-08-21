@@ -51,7 +51,6 @@ void Player::reset() {
 	mouse_state[0] = mouse_state[1] = Vector2f(0,0);
 	button_pressed = false;
 	puzzle = NULL;
-	
 }
 
 
@@ -188,13 +187,23 @@ void Player::set_gl_matrix() {
 }
 
 void Player::draw() {
+	Vector3f du, dv, n;
+	particle.coordinate.tangent_space(du, dv, n);
 	auto p = particle.coordinate.position;
 
+
+	/*
 	glPointSize(10);
 	glBegin(GL_POINTS);
 	glColor3f(1, 1, 1);
 	glVertex3f(p[0], p[1], p[2]);
 	glEnd();
+	*/
+
+	glPushMatrix();
+	glTranslatef(p[0]+n[0], p[1]+n[1], p[2]+n[2]);
+	model->draw();
+	glPopMatrix();
 	
 	
 	
