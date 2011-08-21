@@ -205,6 +205,7 @@ void Player::draw() {
 	auto rot = AngleAxisf(particle.rotation);
 	glTranslatef(c[0], c[1], c[2]);
 	glRotatef(rot.angle() * (180./M_PI), rot.axis()[0], rot.axis()[1], rot.axis()[2]);
+	glScalef(2.*particle.radius,2.*particle.radius, 2.*particle.radius);
 	model->draw();
 	glPopMatrix();
 	

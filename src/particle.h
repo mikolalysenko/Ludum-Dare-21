@@ -66,7 +66,7 @@ struct Particle {
 		//Integrate rotation
 		if(mag > 1e-8) {
 			Vector3f normal = coordinate.interpolated_normal();
-			AngleAxisf rot(mag*delta_t, normal.cross(velocity).normalized());
+			AngleAxisf rot(mag*delta_t/radius, normal.cross(velocity).normalized());
 			rotation = rot * rotation;
 		}
 		
