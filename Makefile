@@ -25,7 +25,7 @@ builddir = obj
 INC_PATH = -I$(srcdir) -I/usr/local/include -Iincludes
 
 # libraries link options ('-lm' is common to link with the math library)
-LNK_LIBS = -L/usr/local/lib -lglfw -lGL -lGLU -lrt -pthread -ldl -lm -lc
+LNK_LIBS = -L/usr/local/lib -lglfw -lGL -lGLU -lrt -pthread -ldl -lm -lc `sdl-config --cflags --libs`
 
 # other compilation options
 COMPILE_OPTS = -pthread
@@ -237,7 +237,7 @@ endif
 # If the goal has changed then we must rebuild on a clean state because
 # pre-processor DEFINE's may have changed.
 $(goal_flag_file): $(builddir)
-	rm -f $(exe) $(goal_flag_file_prefix)* $(objs) $(deps)
+	#rm -f $(exe) $(goal_flag_file_prefix)* $(objs) $(deps)
 	touch $@
 
 ###############################################################################
