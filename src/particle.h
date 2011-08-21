@@ -49,7 +49,7 @@ struct Particle {
 		forces = Vector3f(0,0,0);
 		velocity = coordinate.project_to_tangent_space(velocity);
 		if(coordinate.solid) {
-			velocity *= coordinate.friction();
+			velocity *= exp(-delta_t * coordinate.friction());
 		}
 		
 		//Integrate position

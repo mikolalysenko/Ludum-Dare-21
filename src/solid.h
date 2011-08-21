@@ -19,6 +19,8 @@ struct Vertex {
 
 struct Cell {
 	float density, friction;
+	
+	//Friction ~ 1/number of seconds before stopping
 };
 
 struct Solid {
@@ -80,7 +82,7 @@ struct Solid {
 		Vector3i iv;
 		Vector3f fv;
 		if(!coordinate_parts(v, iv, fv))
-			return 1.f;
+			return 0.f;
 				
 		float t = 0.0f;
 		for(int ix=0; ix<2; ++ix)

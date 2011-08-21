@@ -12,15 +12,6 @@
 using namespace std;
 using namespace Eigen;
 
-Player::Player() :
-	force_rotation(1, 0, 0, 0),
-	camera_position(0, 0, 0),
-	button_pressed(false),
-	drotation(1, 0, 0, 0)
-{
-	mouse_state[0] = mouse_state[1] = Vector3f(0,0,0);
-	button_pressed = false;
-}
 
 //Resets the player
 void Player::reset() {
@@ -34,6 +25,7 @@ void Player::reset() {
 	target_position = Vector3f(0, 0, 0);
 	camera_up = Vector3f(0, 0, 0);
 	drotation = Quaternionf(1, 0, 0, 0);
+	mouse_state[0] = mouse_state[1] = Vector3f(0,0,0);
 	button_pressed = false;
 	puzzle = NULL;
 }
@@ -95,27 +87,25 @@ void Player::tick(float dt) {
 	//Keep camera from colliding
 	for(int i=0; i<puzzle->solids.size(); ++i) {
 		auto s = puzzle->solids[i];
-		if( (*s)(camera_position) > -5. ) {
-			for(int j=0; j<64; ++j) {
-				auto grad = s->gradient(camera_position);
-				
-				
-				cout << "Colliding: " << camera_position << endl
-					 << "grad : " << grad << endl
-					 << "potential : " << (*s)(camera_position) << endl;
-				
-				
-				camera_position -= grad.normalized() / 16.f;
-				
-				if( (*s)(camera_position) <=  -5.f ) {
-					break;
-				}
-			}
+		
+		if( (*s)(camera_position) > -1e6 )
+			continue;
+		
+		float lo=0, hi=1.0, m;
+		while(abs(lo - hi) > 1e-6) {
+			m = 0.5 * (lo + hi);
 			
-			if( (*s)(camera_position) > -5.f ) {
-				camera_position = target_position;
+			auto x = camera_position*(1.-m) + p*m;
+			
+			if( (*s)(x) > -1e6 ) {
+				hi = m;
+			}
+			else {
+				lo = m;
 			}
 		}
+		
+		camera_position = camera_position*(1.-m) + p*m;
 	}
 }
 

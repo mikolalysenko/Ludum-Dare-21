@@ -25,9 +25,6 @@ struct Player {
 	//Puzzle data
 	struct Puzzle* puzzle;
 
-	//Constructor
-	Player();
-	
 	//Event handlers
 	void reset();
 	void input();

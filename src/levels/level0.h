@@ -15,7 +15,7 @@ struct Level0Solid {
 		
 		Cell result;
 		result.density = -(v[0] * v[1] * v[2]);
-		result.friction = 1.;
+		result.friction = 0.;
 		return result;
 	}
 };
