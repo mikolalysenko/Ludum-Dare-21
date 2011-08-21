@@ -22,6 +22,8 @@ struct Entity {
 	virtual void init() {}
 	virtual void tick(float dt) {}
 	virtual void draw() {}
+
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };
 
 //Special entity that sets position player start position
@@ -41,6 +43,8 @@ struct StartEntity : public Entity {
 	virtual void init() {}
 	virtual void tick(float dt) {}
 	virtual void draw() {}
+
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };
 
 //A puzzle/level object
