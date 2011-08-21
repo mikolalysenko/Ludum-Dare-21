@@ -9,10 +9,11 @@
 #include <mesh/mesh.h>
 
 #include "solid.h"
-#include "levels.h"
 #include "surface_coordinate.h"
 #include "particle.h"
 #include "player.h"
+
+#include "levels/level0.h"
 
 using namespace std;
 using namespace Eigen;
@@ -25,20 +26,16 @@ bool running = true;
 GLuint scene_display_list = 0;
 double fov=45., znear=1., zfar=1000.;
 
-Solid puzzle(
-	Vector3i(16, 16, 16),
-	Vector3f(-10, -10, -10),
-	Vector3f( 10,  10,  10));
-
-vector<Particle> particles;
+//vector<Particle> particles;
 
 Player player;
+Puzzle puzzle;
 
 void init() {
-	Level0		level_func;
-	Level0Attr	attr_func;
-	setup_solid(puzzle, level_func, attr_func);
-		
+	Level0::Level0 level_gen;
+	setup_puzzle(puzzle, level_gen, &player);
+	
+	/*
 	//Generate a bunch of random particles
 	for(int i=0; i<100; ++i) {
 		int t = rand() % puzzle.mesh.triangles().size();
@@ -51,6 +48,7 @@ void init() {
 				Vector3f(drand48(), drand48(), drand48()),
 				(float)(drand48()*10.f) ));
 	}
+	*/
 	
 	//TODO: Create the player
 }
@@ -70,12 +68,15 @@ void tick() {
 	auto t = glfwGetTime();
 	auto dt = t - last_t;
 	last_t = t;
-	
+
+	/*
 	for(int i=0; i<particles.size(); ++i) {
 		particles[i].integrate(dt);
 	}
-	
+	*/
+		
 	player.tick(dt);
+	puzzle.tick(dt);
 }
 
 void draw() {
@@ -106,6 +107,10 @@ void draw() {
     //Draw the level
     puzzle.draw();
     
+    //Draw the player
+    player.draw();
+    
+    /*
     //Draw particles
     glPointSize(5);
     glBegin(GL_POINTS);
@@ -115,6 +120,7 @@ void draw() {
 	    glVertex3f(p.coordinate.position[0], p.coordinate.position[1], p.coordinate.position[2]);
 	}
     glEnd();
+    */
 }
 
 };

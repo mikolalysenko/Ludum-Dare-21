@@ -12,13 +12,27 @@ using namespace std;
 using namespace Eigen;
 
 Player::Player() :
+	force_rotation(1, 0, 0, 0),
 	camera_rotation(1, 0, 0, 0),
 	camera_position(0, 0, 0),
-	camera_target(0, 0, 0),
 	button_pressed(false),
 	drotation(1, 0, 0, 0)
 {
 	mouse_state[0] = mouse_state[1] = Vector3f(0,0,0);
+	button_pressed = false;
+}
+
+//Resets the player
+void Player::reset() {
+	particle.coordinate = IntrinsicCoordinate(-1, Vector3f(0,0,0), NULL);
+	particle.velocity = Vector3f(0, 0, 0);
+	particle.forces = Vector3f(0, 0, 0);
+	particle.color = Vector3f(1, 1, 1);
+	particle.mass = 1.0f;
+	force_rotation = Quaternionf(1, 0, 0, 0);
+	camera_rotation = Quaternionf(1, 0, 0, 0);
+	camera_position = Vector3f(0, 0, 0);
+	drotation = Quaternionf(1, 0, 0, 0);
 	button_pressed = false;
 }
 
@@ -51,14 +65,17 @@ void Player::input() {
     		w * (mouse_state[0][0] - mouse_state[1][0]),
             mouse_state[1][0] * mouse_state[0][1] - mouse_state[1][1] * mouse_state[0][0]);
         
-    	camera_rotation = (camera_rotation * drotation).normalized();
+    	force_rotation = (force_rotation * drotation).normalized();
     }
 }
 
 void Player::tick(float dt) {
 
+	//Apply attractive force from camera
+	particle.apply_force( force_rotation * Vector3f(0, -10, 0) );
+
 	//Integrate position
-	//particle.integrate(dt);
+	particle.integrate(dt);
 	
 	//TODO: Update camera position
 }
@@ -78,5 +95,13 @@ void Player::set_gl_matrix() {
             glRotated(180., camera_rotation.x(), camera_rotation.y(), camera_rotation.z());
         }
     }
+}
+
+void Player::draw() {
+	glPointSize(10);
+	glBegin(GL_POINTS);
+	glColor3f(1, 1, 1);
+	glVertex3f(particle.coordinate.position[0], particle.coordinate.position[1], particle.coordinate.position[2]);
+	glEnd();
 }
 
