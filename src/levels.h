@@ -1,10 +1,11 @@
 #ifndef LEVELS_H
 #define LEVELS_H
 
+#include <cmath>
 #include "solid.h"
 
 struct Level0 {
-	Cell operator()(Eigen::Vector3f const& v) const {
+	Cell operator()(Eigen::Vector3f v) const {
 		using namespace Eigen;
 		
 		Cell result;

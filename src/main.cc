@@ -12,6 +12,7 @@
 #include "levels.h"
 #include "surface_coordinate.h"
 #include "particle.h"
+#include "player.h"
 
 using namespace std;
 using namespace Eigen;
@@ -24,17 +25,14 @@ bool running = true;
 GLuint scene_display_list = 0;
 double fov=45., znear=1., zfar=1000.;
 
-int mx=0, my=0, mz=0;
-double vw=1., vx=0., vy=0., vz=0.;
-double tx = 0., ty=0., tz=100.;
-
 Solid puzzle(
 	Vector3i(16, 16, 16),
 	Vector3f(-10, -10, -10),
 	Vector3f( 10,  10,  10));
 
-
 vector<Particle> particles;
+
+Player player;
 
 void init() {
 	Level0		level_func;
@@ -42,7 +40,7 @@ void init() {
 	setup_solid(puzzle, level_func, attr_func);
 		
 	//Generate a bunch of random particles
-	for(int i=0; i<10000; ++i) {
+	for(int i=0; i<100; ++i) {
 		int t = rand() % puzzle.mesh.triangles().size();
 		particles.push_back(
 			Particle(
@@ -53,6 +51,8 @@ void init() {
 				Vector3f(drand48(), drand48(), drand48()),
 				(float)(drand48()*10.f) ));
 	}
+	
+	//Create the player
 }
 
 void input() {
@@ -62,45 +62,8 @@ void input() {
         running = false;
     }
     
-    
-    int w, h;
-    glfwGetWindowSize(&w, &h);
-    
-    //Update view
-    int px = mx, py = my, pz = mz;
-    glfwGetMousePos(&mx, &my);
-    mx -= w/2;
-    my -= h/2;
-    mz = glfwGetMouseWheel();
-    
-    if(glfwGetMouseButton(GLFW_MOUSE_BUTTON_LEFT)) {
-        double  nx = w * (my - py),
-                ny = w * (px - mx),
-                nz = mx * py - my * px,
-                nw = mx * px + my * py + w * w;
-                
-        double  qw = vw * nw - vx * nx - vy * ny - vz * nz,
-                qx = vw * nx + vx * nw + vy * nz - vz * ny,
-                qy = vw * ny - vx * nz + vy * nw + vz * nx,
-                qz = vw * nz + vx * ny - vy * nx + vz * nw;
-                
-        double l = sqrt(qw * qw + qx * qx + qy * qy + qz * qz);
-        
-        if(l < 0.0001) {
-            vx = vy = vz = 0.;
-            vw = 1.;
-        }
-        else {
-            vw = qw / l;
-            vx = qx / l;
-            vy = qy / l;
-            vz = qz / l;
-        }
-    }
-    
-    tz += (pz - mz) * 10;
+    player.input();
 }
-
 
 void tick() {
 	static double last_t = 0.0;
@@ -111,6 +74,8 @@ void tick() {
 	for(int i=0; i<particles.size(); ++i) {
 		particles[i].integrate(dt);
 	}
+	
+	player.tick(dt);
 }
 
 void draw() {
@@ -131,19 +96,9 @@ void draw() {
     gluPerspective(fov, (float)w / (float)h, znear, zfar);
     
     glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-	glTranslated(-tx, -ty, -tz);
-
-    double m = sqrt(1. - vw*vw);
-    if(m > 0.0001) {
-        if(abs(vw) > 0.0001) {    
-            glRotated(-acos(vw) * 360. / M_PI, vx / m, vy / m, vz / m);
-        }
-        else {
-            glRotated(180., vx, vy, vz);
-        }
-    }
+    
+  	//Set camera
+    player.set_gl_matrix();
     
     //Draw the level
     puzzle.draw();

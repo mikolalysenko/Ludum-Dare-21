@@ -40,8 +40,12 @@ struct IntrinsicCoordinate {
 	
 	//Recovers local triangle vertices
 	std::array<Eigen::Vector3f, 3> triangle_vertices() const {
-		auto tri = solid->mesh.triangle(triangle_index);	
 		std::array<Eigen::Vector3f,3> v;
+		if(!solid) {
+			return v;
+		}
+	
+		auto tri = solid->mesh.triangle(triangle_index);	
 		for(int i=0; i<3; ++i) {
 			v[i] = solid->mesh.vertex(tri.v[i]).position;
 		}
@@ -51,6 +55,10 @@ struct IntrinsicCoordinate {
 	//Project the vector v to the tangent space at this point
 	Eigen::Vector3f project_to_tangent_space(Eigen::Vector3f const& v) const {
 		using namespace Eigen;
+		if(!solid) {
+			return v;
+		}
+		
 		auto tri = solid->mesh.triangle(triangle_index);
 		auto verts = triangle_vertices();
 		Vector3f du = verts[1] - verts[0],
@@ -176,8 +184,6 @@ struct IntrinsicCoordinate {
 				}
 			}
 		}
-		
-		//cout << "Done" << endl;
 		
 		return v_dir * i_mag;
 	}
