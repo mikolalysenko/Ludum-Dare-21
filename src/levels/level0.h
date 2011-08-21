@@ -14,8 +14,8 @@ struct Level0Solid {
 		using namespace Eigen;
 		
 		Cell result;
-		result.density = -(v[0] * v[1] * v[2]);
-		result.friction = 0.;
+		result.density = 50.0 - v.dot(v);
+		result.friction = 1.0/4.0;
 		return result;
 	}
 };
@@ -27,7 +27,7 @@ struct Level0Attr {
 		Vertex result;
 		result.position = v;
 		result.normal = Vector3f(1, 0, 0);
-		result.color = v;
+		result.color = Vector3f(0.2,0.2,0.2)*drand48();
 		return result;
 	}
 };
@@ -39,7 +39,7 @@ struct Level0 {
 		
 		//Create geometry
 		auto level = new Solid(
-			Vector3i( 16,  16,  16),
+			Vector3i( 32,  32,  32),
 			Vector3f(-10, -10, -10),
 			Vector3f( 10,  10,  10));
 		Level0Solid	level_func;

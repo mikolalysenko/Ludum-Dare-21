@@ -57,6 +57,31 @@ struct Particle {
 		velocity = coordinate.advect(velocity * delta_t).normalized() * mag;
 	}
 	
+	Eigen::Matrix3f frame() const {
+		using namespace Eigen;
+		Vector3f du, dv, n;
+		coordinate.tangent_space(du, dv, n);
+		
+		Vector3f tangent;
+		if(velocity.norm() > 1e-8) {
+			tangent = velocity.normalized();
+		}
+		else if(forces.norm() > 1e-8) {
+			tangent = forces.normalized();
+		}
+		else {
+			tangent = du.normalized();
+		}
+		
+		Vector3f binormal = n.cross(tangent).normalized();
+		
+		Matrix3f result;
+		result.row(0) = tangent;
+		result.row(1) = n;
+		result.row(2) = binormal;
+		return result;
+	}
+	
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };
 
