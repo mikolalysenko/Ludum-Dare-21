@@ -13,6 +13,7 @@
 #include "surface_coordinate.h"
 #include "particle.h"
 #include "player.h"
+#include "sound.h"
 
 using namespace std;
 using namespace Eigen;
@@ -119,12 +120,26 @@ void draw() {
 
 };
 
-int main(int argc, char* argv[]) {
+int initialize_libs()
+{
     glfwInit();
-    if (!glfwOpenWindow(1280, 1024, 8, 8, 8, 8, 16, 0, GLFW_WINDOW)) {
-        glfwTerminate();
-        return -1;
-    }
+    if (!glfwOpenWindow(1280, 1024, 8, 8, 8, 8, 16, 0, GLFW_WINDOW))
+        return 0;
+
+	if(!initialize_sound_driver())
+		return 0;
+	
+	return 1;
+}
+
+int main(int argc, char* argv[])
+{
+	if(!initialize_libs())
+	{
+		glfwTerminate();
+		return -1;
+	}
+	
     glfwSetWindowTitle("Mesh Demo");
     
     App::init();
