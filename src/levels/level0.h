@@ -39,7 +39,7 @@ struct Level0 {
 		
 		//Create geometry
 		auto level = new Solid(
-			Vector3i( 32,  32,  32),
+			Vector3i( 64,  64,  64),
 			Vector3f(-10, -10, -10),
 			Vector3f( 10,  10,  10));
 		Level0Solid	level_func;

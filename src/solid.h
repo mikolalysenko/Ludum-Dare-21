@@ -146,7 +146,9 @@ void setup_solid(Solid& solid, ImplicitFunc_t& func, StyleFunc_t& style_func) {
 		solid.lower_bound,
 		solid.upper_bound,
 		solid.resolution );
-		
+	
+	Mesh::estimate_normals(solid.mesh);
+	
 	//Generate display/collision stuff
 	solid.setup_data();
 }

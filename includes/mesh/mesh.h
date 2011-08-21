@@ -13,6 +13,7 @@
 #include "mesh/algorithms/connected_components.h"
 #include "mesh/algorithms/contour.h"
 #include "mesh/algorithms/repair.h"
+#include "mesh/algorithms/normals.h"
 
 //Serialization
 #include "mesh/serialize/ply.h"

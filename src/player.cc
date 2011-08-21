@@ -187,10 +187,8 @@ void Player::set_gl_matrix() {
 }
 
 void Player::draw() {
-	Vector3f du, dv, n;
-	particle.coordinate.tangent_space(du, dv, n);
 	auto p = particle.coordinate.position;
-
+	auto n = particle.coordinate.interpolated_normal();
 
 	/*
 	glPointSize(10);
@@ -204,8 +202,6 @@ void Player::draw() {
 	glTranslatef(p[0]+n[0], p[1]+n[1], p[2]+n[2]);
 	model->draw();
 	glPopMatrix();
-	
-	
 	
 	if(button_pressed) {
 		glDisable(GL_DEPTH_TEST);

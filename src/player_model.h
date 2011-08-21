@@ -19,10 +19,10 @@ struct PlayerStyleFunc {
 		
 		Vertex result;
 		result.position = v;
-		result.normal = Vector3f(1, 0, 0);
 		
 		float t = drand48();
 		result.color = Vector3f(t,t*0.2,t*(0.4 * t + (1-t)*0.6));
+		
 		return result;
 	}
 };

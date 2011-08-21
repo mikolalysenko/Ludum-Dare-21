@@ -115,6 +115,26 @@ struct IntrinsicCoordinate {
 		}
 	}
 	
+	
+	//Computes an interpolated normal at a given point
+	Eigen::Vector3f interpolated_normal() const {
+		using namespace Eigen;
+		
+		if(!solid) {
+			return Vector3f(0, 1, 0);
+		}
+		
+		auto verts = triangle_vertices();
+		Vector3f du, dv, n;
+		tangent_space(du, dv, n);
+		
+		auto mu = barycentric(position, n, du, dv, verts[0]);
+		auto tri = solid->mesh.triangle(triangle_index);
+		return (mu[0] * solid->mesh.vertex(tri.v[0]).normal +
+		        mu[1] * solid->mesh.vertex(tri.v[1]).normal +
+		        mu[2] * solid->mesh.vertex(tri.v[2]).normal).normalized();
+	}
+	
 	//Advects a point along the surface, while parallel transporting v
 	Eigen::Vector3f advect(Eigen::Vector3f const& v) {
 		using namespace Eigen;
@@ -149,7 +169,7 @@ struct IntrinsicCoordinate {
 			//Compute advected position in barycentric coordinates
 			Vector3f mu = barycentric(position + residual_velocity, n, du, dv, verts[0]),
 					 nu = barycentric(position, n, du, dv, verts[0]);
-			clamp_barycentric(nu);
+			//clamp_barycentric(nu);
 			
 			//Find intersection with edge of triangle
 			Vector3f db = mu - nu;
@@ -171,7 +191,7 @@ struct IntrinsicCoordinate {
 			
 			//Update position and residual velocity
 			Vector3f b = nu + db * t;
-			clamp_barycentric(b);
+			//clamp_barycentric(b);
 			auto nposition = verts[0] + b[2]*du + b[1]*dv;
 			float dposition = (nposition - position).norm();
 			v_mag = max(0.f, v_mag - dposition);
