@@ -75,8 +75,7 @@ void Player::input() {
 	if(nstate & !button_pressed) {
 		Vector3f p = particle.coordinate.position,
 				 c = camera_position,
-				 du, dv, n;
-		particle.coordinate.tangent_space(du, dv, n);
+				 n = particle.coordinate.interpolated_normal();
 		force_right = camera_up.cross(c - p).normalized();
 		force_up = n.cross(force_right).normalized();
 	}
@@ -105,7 +104,7 @@ void Player::tick(float dt) {
 	//particle.apply_force( force_rotation * Vector3f(0, -1, 0) );
 	if(button_pressed) {
 
-		//Reproject forces	
+		//Reproject forces
 		force_up = particle.coordinate.project_to_tangent_space(force_up).normalized();
 		force_right = particle.coordinate.project_to_tangent_space(force_right);
 		force_right = (force_right - force_up.dot(force_right) * force_up).normalized();
@@ -129,8 +128,10 @@ void Player::tick(float dt) {
 
 	
 	//Compute target camera position and orientation
-	Vector3f du, dv, n, vel = particle.velocity, p = particle.coordinate.position;
-	particle.coordinate.tangent_space(du, dv, n);
+	Vector3f
+		n = particle.coordinate.interpolated_normal(),
+		vel = particle.velocity, 
+		p = particle.coordinate.position;
 	
 	if(button_pressed) {
 		target_position = p - force_up * camera_distance + n * camera_height;
