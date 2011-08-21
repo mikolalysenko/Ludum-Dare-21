@@ -12,8 +12,7 @@ struct Player {
 	Eigen::Quaternionf	force_rotation;
 
 	//Camera parameters
-	Eigen::Quaternionf	camera_rotation;
-	Eigen::Vector3f		camera_position;
+	Eigen::Vector3f		camera_position, camera_up, target_position;
 	
 	//Mouse state/input
 	bool button_pressed;
@@ -22,6 +21,9 @@ struct Player {
 
 	//Physical parameters
 	Particle particle;
+	
+	//Puzzle data
+	struct Puzzle* puzzle;
 
 	//Constructor
 	Player();
@@ -35,6 +37,8 @@ struct Player {
 
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };
+
+#include "puzzle.h"
 
 #endif
 

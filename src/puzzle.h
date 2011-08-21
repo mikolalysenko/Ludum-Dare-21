@@ -29,15 +29,8 @@ struct Entity {
 //Special entity that sets position player start position
 struct StartEntity : public Entity {
 	
-	Eigen::Quaternionf	camera_rotation;
-	Eigen::Vector3f		camera_position;
-	
-	StartEntity(IntrinsicCoordinate const& coord, 
-		Eigen::Quaternionf c_rot,
-		Eigen::Vector3f c_pos) :
-		Entity(coord),
-		camera_rotation(c_rot),
-		camera_position(c_pos) {}
+	StartEntity(IntrinsicCoordinate const& coord) :
+		Entity(coord) {}
 	
 	virtual ~StartEntity() {}
 	virtual void init() {}

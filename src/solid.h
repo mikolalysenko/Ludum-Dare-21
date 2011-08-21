@@ -62,7 +62,7 @@ struct Solid {
 		Vector3i iv;
 		Vector3f fv;
 		if(!coordinate_parts(v, iv, fv))
-			return -1.f;
+			return -1000.f;
 		
 		float t = 0.0f;
 		for(int ix=0; ix<2; ++ix)
@@ -90,6 +90,26 @@ struct Solid {
 			t += cell(iv[0]+ix, iv[1]+iy, iv[2]+iz).friction * w;
 		}
 		return t;
+	}
+	
+	Eigen::Vector3f gradient(Eigen::Vector3f const& v) const {
+		using namespace Eigen;
+		Vector3i iv;
+		Vector3f fv;
+		if(!coordinate_parts(v, iv, fv))
+			return Vector3f(0, 0, 0);
+				
+		Vector3f r(0,0,0);
+		for(int ix=0; ix<2; ++ix)
+		for(int iy=0; iy<2; ++iy)
+		for(int iz=0; iz<2; ++iz) {
+			Vector3f w(
+				(ix?1:-1)*fabsf((1.f-iy-fv[1])*(1.f-iz-fv[2])),
+				(iy?1:-1)*fabsf((1.f-ix-fv[0])*(1.f-iz-fv[2])),
+				(iz?1:-1)*fabsf((1.f-iy-fv[1])*(1.f-ix-fv[0])));
+			r += cell(iv[0]+ix, iv[1]+iy, iv[2]+iz).density * w;
+		}
+		return r;
 	}
 
 	Cell& cell(int i, int j, int k) {

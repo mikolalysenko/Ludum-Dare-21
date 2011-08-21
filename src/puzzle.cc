@@ -5,6 +5,7 @@ void Puzzle::init(Player* pl) {
 	
 	//Reset player
 	player->reset();
+	player->puzzle = this;
 	
 	//Set initial position and camera
 	for(int i=0; i<entities.size(); ++i) {
@@ -13,8 +14,6 @@ void Puzzle::init(Player* pl) {
 			continue;
 		
 		player->particle.coordinate = ptr->coordinate;
-		player->camera_rotation = ptr->camera_rotation;
-		player->camera_position = ptr->camera_position;
 		break;
 	}
 }

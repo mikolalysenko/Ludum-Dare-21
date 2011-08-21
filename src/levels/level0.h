@@ -54,9 +54,7 @@ struct Level0 {
 			IntrinsicCoordinate(
 				0,
 				level->mesh.vertex(tri.v[0]).position,
-				level),
-			Quaternionf(1, 0, 0, 0),
-			Vector3f(0, 0, 0) ) );
+				level)) );
 	}
 };
 

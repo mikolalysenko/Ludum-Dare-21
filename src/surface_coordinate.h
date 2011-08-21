@@ -52,6 +52,21 @@ struct IntrinsicCoordinate {
 		return v;
 	}
 	
+	//Extracts u,v,n tangent space coordinates at point
+	void tangent_space(Eigen::Vector3f& du, Eigen::Vector3f& dv, Eigen::Vector3f& n) const { 
+		using namespace Eigen;
+		if(!solid) {
+			du = Vector3f(1, 0, 0);
+			dv = Vector3f(0, 0, 1);
+			n  = Vector3f(0, 1, 0);
+			return;
+		}
+		auto verts = triangle_vertices();
+		du = verts[2] - verts[0];
+	 	dv = verts[1] - verts[0];			
+		n = du.cross(dv).normalized();
+	}
+	
 	//Project the vector v to the tangent space at this point
 	Eigen::Vector3f project_to_tangent_space(Eigen::Vector3f const& v) const {
 		using namespace Eigen;
@@ -59,11 +74,8 @@ struct IntrinsicCoordinate {
 			return v;
 		}
 		
-		auto tri = solid->mesh.triangle(triangle_index);
-		auto verts = triangle_vertices();
-		Vector3f du = verts[1] - verts[0],
-				 dv = verts[2] - verts[0];			
-		Vector3f n = du.cross(dv).normalized();
+		Vector3f du, dv, n;
+		tangent_space(du, dv, n);
 		return v - n * n.dot(v);
 	}
 	
