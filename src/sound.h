@@ -14,7 +14,7 @@
 
 int initialize_sound_driver();
 bool set_sound_format(int freq, bool stereo);
-int load_sound(char* path);
+int load_sound(const char* path);
 int play_sound(int i);
 
 class Sound;
@@ -23,7 +23,7 @@ class AudioStream;
 class Sound
 {
 	public:
-		Sound(char* path);
+		Sound(const char* path);
 		void set_format(SDL_AudioSpec,AudioStream**);
 		~Sound();
 	
@@ -62,7 +62,7 @@ class AudioDriver
 		void unload();
 		bool set_format(int freq, bool stereo);
 		void mix_audio(Uint8 *stream, int len);
-		int load_sound_from_file(char* path);
+		int load_sound_from_file(const char* path);
 		int play_sound_object(int i);
 		void stop_stream(int i);
 	

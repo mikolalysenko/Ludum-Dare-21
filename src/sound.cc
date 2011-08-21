@@ -14,7 +14,7 @@ bool set_sound_format(int freq, bool stereo)
 	return driver.set_format(freq, stereo);
 }
 
-int load_sound(char* path)
+int load_sound(const char* path)
 {
 	return driver.load_sound_from_file(path);
 }
@@ -108,7 +108,7 @@ void Sound::set_format(SDL_AudioSpec newfmt, AudioStream** streams)
 	//TODO: scale the current position of the streams by the change in format length. That way, we can maintain continuity of sound even though the format changes
 }
 
-Sound::Sound(char* path)
+Sound::Sound(const char* path)
 {
 	valid = false;
 	data = NULL;
@@ -136,7 +136,7 @@ void AudioDriver::stop_stream(int i)
 	}
 }
 
-int AudioDriver::load_sound_from_file(char* path)
+int AudioDriver::load_sound_from_file(const char* path)
 {
 	Sound* s = new Sound(path);
 	
