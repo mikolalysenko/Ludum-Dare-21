@@ -52,7 +52,7 @@ void init() {
 				(float)(drand48()*10.f) ));
 	}
 	
-	//Create the player
+	//TODO: Create the player
 }
 
 void input() {
@@ -87,10 +87,13 @@ void draw() {
     glViewport(0, 0, w, h);
 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CW);
 
     glClearColor(0.3, 0.3, 0.8, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
+    //Set up projection matrix
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(fov, (float)w / (float)h, znear, zfar);
@@ -103,6 +106,7 @@ void draw() {
     //Draw the level
     puzzle.draw();
     
+    //Draw particles
     glPointSize(5);
     glBegin(GL_POINTS);
     for(int i=0; i<particles.size(); ++i) {
