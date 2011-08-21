@@ -12,44 +12,38 @@
 #include "mesh/mesh.h"
 #include "solid.h"
 
-template<typename t> t clamp(t const& a, t const& b, t const& c) {
-	if(a < b) { return b; }
-	if(a > c) { return c; }
-	return a;
-}
-
 //A surface coordinate!
 struct IntrinsicCoordinate {
 	int triangle_index;
 	Eigen::Vector3f	position;
-	Mesh::TriMesh<Vertex>* mesh;
+	Solid* solid;
 	
 	//Boiler plate constructors
 	IntrinsicCoordinate() : 
 		triangle_index(0), 
 		position(0,0,0), 
-		mesh(NULL) {}
+		solid(NULL) {}
 	IntrinsicCoordinate(IntrinsicCoordinate const& c) : 
 		triangle_index(c.triangle_index),
 		position(c.position),
-		mesh(c.mesh) {}
-	IntrinsicCoordinate(int t, Eigen::Vector3f const& p, Mesh::TriMesh<Vertex>* m) :
+		solid(c.solid) {}
+	IntrinsicCoordinate(int t, Eigen::Vector3f const& p, Solid* m) :
 		triangle_index(t),
 		position(p),
-		mesh(m) {}
+		solid(m) {}
 	IntrinsicCoordinate& operator=(IntrinsicCoordinate const& c) {
 		triangle_index = c.triangle_index;
 		position = c.position;
-		mesh = c.mesh;
+		solid = c.solid;
 		return *this;
 	}		
 	
 	//Recovers local triangle vertices
 	std::array<Eigen::Vector3f, 3> triangle_vertices() const {
-		auto tri = mesh->triangle(triangle_index);	
+		auto tri = solid->mesh.triangle(triangle_index);	
 		std::array<Eigen::Vector3f,3> v;
 		for(int i=0; i<3; ++i) {
-			v[i] = mesh->vertex(tri.v[i]).position;
+			v[i] = solid->mesh.vertex(tri.v[i]).position;
 		}
 		return v;
 	}
@@ -57,7 +51,7 @@ struct IntrinsicCoordinate {
 	//Project the vector v to the tangent space at this point
 	Eigen::Vector3f project_to_tangent_space(Eigen::Vector3f const& v) const {
 		using namespace Eigen;
-		auto tri = mesh->triangle(triangle_index);
+		auto tri = solid->mesh.triangle(triangle_index);
 		auto verts = triangle_vertices();
 		Vector3f du = verts[1] - verts[0],
 				 dv = verts[2] - verts[0];			
@@ -87,6 +81,7 @@ struct IntrinsicCoordinate {
 		return mu;
 	}
 	
+	//Clamps a set of barycentric coordiantes to valid range
 	static void clamp_barycentric(Eigen::Vector3f& b) {
 		for(int i=0; i<3; ++i) {
 			if(b[i] < 0) {
@@ -105,65 +100,40 @@ struct IntrinsicCoordinate {
 		using namespace Eigen;
 		using namespace std;
 		
+		//Special case:  Not on a solid		
+		if(solid == NULL) {
+			position += v;
+			return v;
+		}
+		
+		
 		//Set up initial vectors
 		Vector3f v_dir = project_to_tangent_space(v);
 		float    v_mag = v_dir.norm();
 		v_dir /= v_mag;
 		const float i_mag = v_mag;
 		
-		/*
-		cout << "Start advect:" << endl
-			 << "v = " << v << endl
-		     << "v_dir = " << v_dir << endl
-		     << "v_mag = " << v_mag << endl;
-		*/
-		
 		while(v_mag > 1e-8) {
 			//Calculate tangent space
-			auto tri = mesh->triangle(triangle_index);
+			auto tri = solid->mesh.triangle(triangle_index);
 			auto verts = triangle_vertices();
 			Vector3f du = verts[2] - verts[0],
 					 dv = verts[1] - verts[0];			
 			Vector3f n = du.cross(dv).normalized();
-			
-			/*
-			cout << "Advecting: p = " << position << endl;
-			for(int i=0; i<3; ++i) {
-				cout << "v[" << i << "]=" << verts[i] << endl;
-			}
-			cout << "Triangle index = " << triangle_index << endl
-				 << "Vertices = ";
-			for(int i=0; i<3; ++i) {
-				cout << tri.v[i] << ',';
-			}
-			cout << endl;
-			*/
 			
 			//Transport velocity
 			Vector3f residual_velocity = v_dir * v_mag;
 			v_dir = (residual_velocity - n * n.dot(residual_velocity)).normalized();
 			residual_velocity = v_dir * v_mag;
 			
-			/*
-			cout << "Velocity direction = " << v_dir << endl 
-				 << "Velocity magnitude = " << v_mag << endl
-				 << "Velocity           = " << residual_velocity << endl;
-			*/
-			
 			//Compute advected position in barycentric coordinates
 			Vector3f mu = barycentric(position + residual_velocity, n, du, dv, verts[0]),
 					 nu = barycentric(position, n, du, dv, verts[0]);
 			clamp_barycentric(nu);
 			
-			/*
-			cout << "mu = " << mu << endl
-				 << "nu = " << nu << endl;
-			*/
-			
 			//Find intersection with edge of triangle
 			Vector3f db = mu - nu;
 			
-			//cout << "db = " << db << endl;
 			float t = 1.f;
 			int last_edge = -1;
 			for(int i=0; i<3; ++i) {
@@ -174,7 +144,6 @@ struct IntrinsicCoordinate {
 				if(abs(db[e]) > 1e-6 && nu[e] + t * db[e] < -1e-8) {
 					last_edge = e;
 					t = -nu[e] / db[e];
-					//cout << "Hit an edge: " << e << endl;
 				}
 			}
 			
@@ -188,13 +157,6 @@ struct IntrinsicCoordinate {
 			v_mag = max(0.f, v_mag - dposition);
 			position = nposition;
 			
-			/*
-			cout << "t = " << t << endl;
-			cout << "dposition = " << dposition << endl;
-			cout << "last_edge = " << last_edge << endl;
-			cout << "Barycentric intersection = " << b << endl;
-			*/
-			
 			//If we are still in the triangle, then we are done!
 			if(last_edge == -1) {
 				break;
@@ -205,9 +167,9 @@ struct IntrinsicCoordinate {
 			for(int i=0; i<3; ++i) {
 				e[i] = tri.v[(last_edge+i)%3];
 			}
-			auto ntris = mesh->vertex_incidence(e[1]);
+			auto ntris = solid->mesh.vertex_incidence(e[1]);
 			for(int i=0; i<ntris.size(); ++i) {
-				auto ntri = mesh->triangle(ntris[i]);
+				auto ntri = solid->mesh.triangle(ntris[i]);
 				if(ntri.index_of(e[2]) >= 0 && ntri.index_of(e[0]) < 0) {
 					triangle_index = ntris[i];
 					break;
@@ -218,6 +180,14 @@ struct IntrinsicCoordinate {
 		//cout << "Done" << endl;
 		
 		return v_dir * i_mag;
+	}
+	
+	//Returns the friction at this point
+	float friction() const {
+		if(solid) {
+			return solid->friction(position);
+		}
+		return 1.f;
 	}
 	
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

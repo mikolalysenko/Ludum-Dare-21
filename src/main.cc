@@ -11,6 +11,7 @@
 #include "solid.h"
 #include "levels.h"
 #include "surface_coordinate.h"
+#include "particle.h"
 
 using namespace std;
 using namespace Eigen;
@@ -32,19 +33,26 @@ Solid puzzle(
 	Vector3f(-10, -10, -10),
 	Vector3f( 10,  10,  10));
 
-IntrinsicCoordinate coord;
-Vector3f velocity(0, 0, 0);
+
+vector<Particle> particles;
 
 void init() {
 	Level0		level_func;
 	Level0Attr	attr_func;
 	setup_solid(puzzle, level_func, attr_func);
-	
-	auto t = puzzle.mesh.triangle(0);
-	coord = IntrinsicCoordinate(
-		0,
-		puzzle.mesh.vertex(t.v[0]).position,
-		&puzzle.mesh);
+		
+	//Generate a bunch of random particles
+	for(int i=0; i<10000; ++i) {
+		int t = rand() % puzzle.mesh.triangles().size();
+		particles.push_back(
+			Particle(
+				IntrinsicCoordinate(t,
+					puzzle.mesh.vertex(puzzle.mesh.triangle(t).v[rand()%3]).position,
+					&puzzle),
+				10.*Vector3f(0.5-drand48(), 0.5-drand48(), 0.5-drand48()),
+				Vector3f(drand48(), drand48(), drand48()),
+				(float)(drand48()*10.f) ));
+	}
 }
 
 void input() {
@@ -54,17 +62,6 @@ void input() {
         running = false;
     }
     
-    static int pressed = false;
-    
-    if( glfwGetKey('A') == GLFW_PRESS ) {
-    	if(!pressed) {
-    		velocity = coord.advect(velocity);
-    		pressed = true;
-    	}
-    }
-    else {
-    	pressed = false;
-    }
     
     int w, h;
     glfwGetWindowSize(&w, &h);
@@ -106,12 +103,14 @@ void input() {
 
 
 void tick() {
-
-	Quaternionf quat(vw, vx, vy, vz);
-
-	velocity += quat * Vector3f(0, 0, 0.1);
-	float m = velocity.norm();
-	velocity = coord.advect(velocity * 0.0001).normalized() * m * 0.995;
+	static double last_t = 0.0;
+	auto t = glfwGetTime();
+	auto dt = t - last_t;
+	last_t = t;
+	
+	for(int i=0; i<particles.size(); ++i) {
+		particles[i].integrate(dt);
+	}
 }
 
 void draw() {
@@ -146,16 +145,16 @@ void draw() {
         }
     }
     
-   	glTranslated(-coord.position[0], -coord.position[1], -coord.position[2]);
-
-    
     //Draw the level
     puzzle.draw();
     
     glPointSize(5);
-    glColor3f(1, 0, 0);
     glBegin(GL_POINTS);
-    glVertex3f(coord.position[0], coord.position[1], coord.position[2]);
+    for(int i=0; i<particles.size(); ++i) {
+    	auto p = particles[i];
+    	glColor3f(p.color[0], p.color[1], p.color[2]);
+	    glVertex3f(p.coordinate.position[0], p.coordinate.position[1], p.coordinate.position[2]);
+	}
     glEnd();
 }
 
