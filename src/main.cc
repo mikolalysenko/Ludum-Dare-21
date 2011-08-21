@@ -335,7 +335,7 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 	
-    glfwSetWindowTitle("Mesh Demo");
+    glfwSetWindowTitle("Help!  I'm stuck in a compact 2D Riemannian manifold!");
     
     App::init();
     while(App::running) {
