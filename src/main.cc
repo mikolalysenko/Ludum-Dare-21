@@ -12,12 +12,12 @@
 #include "surface_coordinate.h"
 #include "particle.h"
 #include "player.h"
+#include "puzzle.h"
+#include "entity.h"
 #include "sound.h"
 #include "text.h"
 #include "menu.h"
-#include "art.h"
-
-#include "levels/level0.h"
+#include "assets.h"
 
 using namespace std;
 using namespace Eigen;
@@ -28,11 +28,7 @@ namespace App {
 bool running = true;
 bool ingame = true;
 
-GLuint scene_display_list = 0;
 double fov=45., znear=1., zfar=1000.;
-
-//vector<Particle> particles;
-Player player;
 Puzzle puzzle;
 	
 Menu* mainmenu;
@@ -80,7 +76,7 @@ void init()
 	srand(time(NULL));
 	
 	//Initialize artwork
-	init_artwork();
+	init_assets();
 	
 	//initialize text stuff
 	initialize_text();
@@ -131,15 +127,8 @@ void init()
 	//TODO: in the future, this should be "showmenu(mainmenu)". Right now, I am defaulting it to just jump right into the game to make development easier (so you don't have to go through menus to test)
 	showmenu(NULL);
 
-	//Create player model
-	PlayerModelFunc player_func;
-	PlayerStyleFunc player_attr;
-	setup_solid(player_model, player_func, player_attr);
-	player.model = &player_model;
-	
 	//initialize level data
-	Level0::Level0 level_gen;
-	setup_puzzle(puzzle, level_gen, &player);
+	puzzle.setup(get_level(0));
 }
 
 bool togglekey(int GLFWKey, int menukey)
@@ -194,7 +183,7 @@ void input()
     
 	//if there is no menu showing, then go ahead any do player input
 	if(currentmenu == NULL)
-		player.input();
+		puzzle.input();
 }
 
 void tick()
@@ -207,7 +196,6 @@ void tick()
 	//if there is no menu showing, then tick the game forward. Otherwise, don't tick (so the game is paused)
 	if(currentmenu == NULL)
 	{
-		player.tick(dt);
 		puzzle.tick(dt);
 	}
 }
@@ -235,14 +223,8 @@ void draw() {
 		
 		glMatrixMode(GL_MODELVIEW);
 		
-		//Set camera
-		player.set_gl_matrix();
-		
 		//Draw the level
 		puzzle.draw();
-		
-		//Draw the player
-		player.draw();
 	}
 
 	//text rendering should be the last thing we do in the render loop

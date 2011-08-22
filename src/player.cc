@@ -9,7 +9,7 @@
 
 #include "player.h"
 #include "puzzle.h"
-#include "art.h"
+#include "assets.h"
 
 using namespace std;
 using namespace Eigen;
@@ -54,7 +54,6 @@ void Player::reset() {
 	camera_up = Vector3f(0, 0, 0);
 	mouse_state[0] = mouse_state[1] = Vector2f(0,0);
 	button_pressed = false;
-	puzzle = NULL;
 }
 
 
