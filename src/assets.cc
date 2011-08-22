@@ -15,6 +15,7 @@
 #include "solid.h"
 #include "surface_coordinate.h"
 #include "puzzle.h"
+#include "entity.h"
 #include "assets.h"
 
 using namespace std;

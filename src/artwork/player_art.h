@@ -21,3 +21,4 @@ struct PlayerStyleFunc {
 		return result;
 	}
 };
+

@@ -213,6 +213,11 @@ void tick()
 	if(currentmenu == NULL)
 	{
 		puzzle.tick(dt);
+
+		//Check for game over
+		if(puzzle.level_complete) {
+			endgame(NULL);
+		}
 	}
 }
 
