@@ -22,8 +22,6 @@ void LevelExitEntity::tick(float dt) {
 	float d = (p->coordinate.position - coordinate.position).norm();
 	if(p->coordinate.solid == coordinate.solid && d <= p->radius) {
 		puzzle->level_complete = true;
-		
-		cout << "LEVEL COMPLETED!!!" << endl;
 	}
 }
 
