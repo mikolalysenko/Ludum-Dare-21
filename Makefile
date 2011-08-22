@@ -203,7 +203,7 @@ $(builddir)/%.o:	src/%.c
 # The goal_flag_file is determined at run time because it must be the current
 # goal and not the goal in use when the dependencies makefile was created.
 $(builddir)/%.$(deps_suffix):	src/%.cc
-	$(CXX) -MM $(CPPOPTS) $(CPPFLAGS) $<
+	$(CXX) -MM -MT $(CPPOPTS) $(CPPFLAGS) $<
 
 # If dependencies have to be up to date then include dependencies makefiles.
 ifeq "$(CHECK_DEPS)" "yes"
