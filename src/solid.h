@@ -47,7 +47,7 @@ struct Solid {
 	
 	//Coordinate functions
 	struct IntrinsicCoordinate random_point();
-	struct IntrinsicCoordiante closest_point(Eigen::Vector3f const& p);
+	struct IntrinsicCoordinate closest_point(Eigen::Vector3f const& p);
 	
 	bool coordinate_parts(
 		Eigen::Vector3f v,

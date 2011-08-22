@@ -40,15 +40,18 @@ struct Level0 : public PuzzleGenerator {
 		puzzle->add_solid(level);
 		
 		//Create start location
-		puzzle->player.particle.coordinate = level->random_point();
-		puzzle->add_entity(new LevelExitEntity(level->random_point()));
+		auto start_pt = level->closest_point(Vector3f(10, 0, 0));
+		auto end_pt = level->closest_point(Vector3f(-10, 0, 0));
+		
+		puzzle->player.particle.coordinate = start_pt;
+		puzzle->add_entity(new LevelExitEntity(end_pt));
 		
 		//Add some teleporters
-		
-		for(int i=0; i<5; ++i) {
+		for(int i=0; i<20; ++i) {
+			float theta = (float)i * M_PI / 10.;
 			puzzle->add_entity(new TeleporterEntity(
-				level->random_point(),
-				level->random_point()));
+				level->closest_point(Vector3f(0, cos(i), sin(i))*10.),
+				start_pt));
 		}
 	}
 	

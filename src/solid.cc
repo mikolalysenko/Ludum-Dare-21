@@ -62,7 +62,6 @@ IntrinsicCoordinate Solid::random_point() {
 		return IntrinsicCoordinate(-1, Vector3f(0,0,0), NULL);
 	}
 
-
 	int rnd_tri = rand() % mesh.triangles().size();
 	auto tr = mesh.triangle(rnd_tri);
 	
@@ -78,5 +77,30 @@ IntrinsicCoordinate Solid::random_point() {
 }
 
 
-struct IntrinsicCoordiante closest_point(Eigen::Vector3f const& p);
+IntrinsicCoordinate Solid::closest_point(Eigen::Vector3f const& p) {
+
+	IntrinsicCoordinate closest_coord(-1, p, NULL);
+	float d = 1e20;
+	
+	for(int i=mesh.triangles().size()-1; i>=0; --i) {
+		IntrinsicCoordinate tmp(i, p, this);
+		
+		//Get closest point
+		auto verts = tmp.triangle_vertices();
+		Vector3f du, dv, n;
+		tmp.tangent_space(du, dv, n);
+		auto mu = IntrinsicCoordinate::barycentric(p, n, du, dv, verts[0]);
+		IntrinsicCoordinate::clamp_barycentric(mu);
+		tmp.position = mu[0] * verts[0] + mu[1] * verts[1] + mu[2] * verts[2];
+		
+		//Check distance
+		float nd = (tmp.position - p).norm();
+		if(nd < d) {
+			d = nd;
+			closest_coord = tmp;
+		}
+	}
+
+	return closest_coord;
+}
 
