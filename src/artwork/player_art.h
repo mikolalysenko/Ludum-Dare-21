@@ -3,7 +3,7 @@ struct PlayerModelFunc {
 	Cell operator()(Eigen::Vector3f v) const {
 		using namespace Eigen;
 		Cell result;
-		result.density = sqrt(5.) - v.dot(v);
+		result.density = sqrt(.5) - v.dot(v);
 		result.friction = 0;
 		return result;
 	}
