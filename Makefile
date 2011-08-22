@@ -60,7 +60,6 @@ ifeq "$(MAKECMDGOALS)" "$(GOAL_DEBUG)"
  # optimization options
  OPTIMISE_OPTS =
  # dependencies must be up to date
- CHECK_DEPS = yes
 
 else
 
@@ -74,7 +73,6 @@ else
   # optimization options
   OPTIMISE_OPTS = -O2
   # dependencies must be up to date
-  CHECK_DEPS = yes
 
  else
 
@@ -88,12 +86,8 @@ else
    # optimization options
    OPTIMISE_OPTS = -O3 -fomit-frame-pointer
    # dependencies must be up to date
-   CHECK_DEPS = yes
 
   else
-
-   # Other goals do not require up to date dependencies.
-   CHECK_DEPS = no
 
   endif
  endif
@@ -122,12 +116,6 @@ objs := $(cppobjs:.cc=.o) $(cobjs:.c=.o)
 
 # executable with full path
 exe = $(EXE)
-
-# This makefile creates and includes makefiles containing actual dependencies.
-# For every source file a dependencies makefile is created and included.
-# The deps variable contains the list of all dependencies makefiles.
-deps_suffix = d
-deps := $(objs:.o=.$(deps_suffix))
 
 ###############################################################################
 # TARGETS
@@ -199,24 +187,6 @@ $(builddir)/%.o:	src/%.cc
 $(builddir)/%.o:	src/%.c
 	$(CC) -c $< $(CPPOPTS) $(CXXOPTS) $(CPPFLAGS) $(CXXFLAGS) -o $@
 
-# Rule to build our included dependencies makefiles.
-# This rule is used by GNU Make because it automatically tries to (re)build
-# obsolete or non-existent included makefiles.
-# These files are created with one line of the form:
-# 1.o 1.d: $(goal_flag_file) 1.cc 1.h 2.h 3.h g.h
-# The implicit rule previously defined will be used for compilation.
-# Note that the dependencies can be goal specific.
-# The goal_flag_file is determined at run time because it must be the current
-# goal and not the goal in use when the dependencies makefile was created.
-$(builddir)/%.$(deps_suffix):	src/%.cc
-	$(CXX) -MM $(CPPOPTS) $(CPPFLAGS) $<
-
-# If dependencies have to be up to date then include dependencies makefiles.
-ifeq "$(CHECK_DEPS)" "yes"
- ifneq "$(strip $(sources))" ""
-  include $(deps)
- endif
-endif
 
 ###############################################################################
 # NON-BUILD TARGETS
@@ -230,4 +200,4 @@ list:
 # Remove all files that are normally created by building the program.
 .PHONY:	clean
 clean:
-	rm -f $(exe) $(objs) $(deps) data/* *.log
+	rm -f $(exe) $(objs)

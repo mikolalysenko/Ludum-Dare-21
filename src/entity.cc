@@ -33,9 +33,6 @@ void LevelExitEntity::draw() {
 	glEnd();
 }
 
-
-
-
 TeleporterEntity::~TeleporterEntity() {}
 
 void TeleporterEntity::init() {
@@ -45,7 +42,9 @@ void TeleporterEntity::tick(float dt) {
 	auto p = &puzzle->player.particle;
 	float d = (p->coordinate.position - coordinate.position).norm();
 	if(p->coordinate.solid == coordinate.solid && d <= p->radius) {
-		puzzle->level_complete = true;
+		cout << "Teleport!" << endl;
+		p->coordinate = target_coordinate;
+		puzzle->player.shake_camera(0.1, 2.0);
 	}
 }
 

@@ -42,6 +42,14 @@ struct Level0 : public PuzzleGenerator {
 		//Create start location
 		puzzle->player.particle.coordinate = level->random_point();
 		puzzle->add_entity(new LevelExitEntity(level->random_point()));
+		
+		//Add some teleporters
+		
+		for(int i=0; i<5; ++i) {
+			puzzle->add_entity(new TeleporterEntity(
+				level->random_point(),
+				level->random_point()));
+		}
 	}
 	
 	virtual void post_init(Puzzle* puzzle) {

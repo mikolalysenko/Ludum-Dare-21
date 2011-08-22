@@ -50,6 +50,8 @@ void Player::reset() {
 	camera_distance = 3.0;
 	camera_height = 9.0;
 	camera_position = Vector3f(0, 0, 0);
+	camera_shake_mag = 0;
+	camera_shake_time = 1.;
 	target_position = Vector3f(0, 0, 0);
 	camera_up = Vector3f(0, 0, 0);
 	mouse_state[0] = mouse_state[1] = Vector2f(0,0);
@@ -151,13 +153,29 @@ void Player::tick(float dt) {
 		
 		camera_position = camera_position*(1.-m) + p*m;
 	}
+	
+	//Update camera shake
+	if(camera_shake_mag > 1e-6) {
+		camera_shake_mag *= exp(-dt * camera_shake_time);
+	}
+	else {
+		camera_shake_mag = 0.;
+		camera_shake_time = 1.;
+	}
 }
 
 void Player::set_gl_matrix() {
     glLoadIdentity();
 
-	Vector3f p = particle.coordinate.position;
-	gluLookAt(camera_position[0], camera_position[1], camera_position[2],
+	auto p = particle.coordinate.position,
+		 e = camera_position;
+		 
+	if(camera_shake_mag > 1e-8) {
+		e += Vector3f(drand48(), drand48(), drand48()) * camera_shake_mag;
+	}
+	
+	gluLookAt(
+		e[0], e[1], e[2],
 		p[0], p[1], p[2],
 		camera_up[0], camera_up[1], camera_up[2]);	
 

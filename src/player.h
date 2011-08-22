@@ -16,6 +16,7 @@ struct Player {
 	//Camera parameters
 	float camera_stiffness, camera_distance, camera_height;
 	Eigen::Vector3f		camera_position, camera_up, target_position;
+	float camera_shake_mag, camera_shake_time;
 	
 	//Mouse state/input
 	bool button_pressed;
@@ -43,6 +44,12 @@ struct Player {
 	void tick(float dt);
 	void set_gl_matrix();
 	void draw();
+	
+	//Functions
+	void shake_camera(float mag, float t) {
+		camera_shake_mag += mag;
+		camera_shake_time = 1.0 / (t + 1.0/camera_shake_time);
+	}
 
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };
