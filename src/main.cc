@@ -33,9 +33,8 @@ Puzzle puzzle;
 	
 Menu* mainmenu;
 Menu* quitmenu;
-Menu* menu1;
-Menu* menu2;
-Menu* menu3;
+Menu* levelmenu;
+Menu* optionsmenu;
 	
 Menu* gamemenu;
 Menu* gamequitmenu;
@@ -69,6 +68,16 @@ void endgame(void* data)
 	ingame = false;
 	showmenu(mainmenu);
 }
+
+void startlevel(void* data)
+{
+	int lev = (int)data;
+
+	puzzle.setup(get_level(lev));
+	ingame = true;
+	
+	showmenu(NULL);
+}
 	
 void init()
 {
@@ -87,31 +96,28 @@ void init()
 	//set up main menu
 	mainmenu = new Menu("Main menu");
 	quitmenu = new Menu("Really quit?");
-	menu1 = new Menu("New menu for option 1");
-	menu2 = new Menu("New menu for option 2");
-	menu3 = new Menu("New menu for option 3");
+	levelmenu = new Menu("Level Select");
+	optionsmenu = new Menu("Options");
 	
-	mainmenu->add_option("Option 1", &showmenu, menu1);
-	mainmenu->add_option("Option 2", &showmenu, menu2);
-	mainmenu->add_option("Option 3", &showmenu, menu3);
+	mainmenu->add_option("Level Select", &showmenu, levelmenu);
+	mainmenu->add_option("Options", &showmenu, optionsmenu);
 	mainmenu->add_option("Exit", &showmenu, quitmenu);
-	mainmenu->set_esc_option(3);
+	mainmenu->set_esc_option(2);
 	
 	quitmenu->add_option("No", &showmenu, mainmenu);
 	quitmenu->add_option("Yes", &exit);
 	quitmenu->set_esc_option(0);
 	
-	menu1->add_option("Go Back", &showmenu, mainmenu);
-	menu1->set_esc_option(0);
+	levelmenu->add_option("Level 1", &startlevel, (void*)0);
+	levelmenu->add_option("Level 2", &startlevel, (void*)1);
+	levelmenu->add_option("Go Back", &showmenu, mainmenu);
+	levelmenu->set_esc_option(2);
 	
-	menu2->add_option("This doesn't do anything either!", &showmenu, mainmenu);
-	menu2->set_esc_option(0);
-
-	menu3->add_option("Try this one (goes back)", &showmenu, mainmenu);
-	menu3->set_esc_option(0);
+	optionsmenu->add_option("Go Back", &showmenu, mainmenu);
+	optionsmenu->set_esc_option(0);
 	
 	//set up in-game menu
-	gamemenu = new Menu("In-Game menu (paused)");
+	gamemenu = new Menu("Select Action (paused)");
 	gamequitmenu = new Menu("Really quit?");
 
 	gamemenu->add_option("Return to game", &showmenu, NULL);
@@ -138,7 +144,7 @@ void init()
 	play_sound_from_group(SOUND_GROUP_CYMBAL, true);*/
 	
 	//initialize level data
-	puzzle.setup(get_level(0));
+	puzzle.setup(get_level(1));
 }
 
 bool togglekey(int GLFWKey, int menukey)
@@ -212,16 +218,16 @@ void tick()
 
 void draw() {
 
+	int w, h;
+	glfwGetWindowSize(&w, &h);
+	glViewport(0, 0, w, h);
+	
 	glClearColor(0.3, 0.3, 0.8, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+
 	//only draw the level and entities, etc. if we are currenty in the game
 	if(ingame)
 	{
-		int w, h;
-		glfwGetWindowSize(&w, &h);
-		glViewport(0, 0, w, h);
-
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
 		glFrontFace(GL_CW);
