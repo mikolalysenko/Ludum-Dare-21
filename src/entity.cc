@@ -38,7 +38,7 @@ void LevelExitEntity::init() {
 
 void LevelExitEntity::tick(float dt) {
 	auto p = &puzzle->player.particle;
-	float d = (p->coordinate.position - coordinate.position).norm();
+	float d = (p->center() - coordinate.position).norm();
 	if(p->coordinate.solid == coordinate.solid && d <= p->radius+1.0) {
 		puzzle->level_complete = true;
 	}
@@ -73,8 +73,8 @@ void TeleporterEntity::init() {
 
 void TeleporterEntity::tick(float dt) {
 	auto p = &puzzle->player.particle;
-	float d = (p->coordinate.position - coordinate.position).norm();
-	if(p->coordinate.solid == coordinate.solid && d <= p->radius) {
+	float d = (p->center() - coordinate.position).norm();
+	if(p->coordinate.solid == coordinate.solid && d <= p->radius + 0.5) {
 		//Update coordinate
 		p->coordinate = target_coordinate;
 		
@@ -111,6 +111,7 @@ ButtonEntity::~ButtonEntity() {}
 void ButtonEntity::init() {
 	pressed = false;
 	last_state = false;
+	time_left = 0.f;
 }
 
 void ButtonEntity::tick(float dt) {
@@ -119,19 +120,46 @@ void ButtonEntity::tick(float dt) {
 	auto p = &puzzle->player.particle;
 	float d = (p->coordinate.position - coordinate.position).norm();
 	if(p->coordinate.solid == coordinate.solid && d <= p->radius) {
-		if(toggleable) {
-			if(!last_state) {
-				pressed = (pressed ? false : true);
-			}
-		} else {
-			pressed = true;
+	
+		switch(type) {
+			case BUTTON_PRESS:
+				pressed = true;
+			break;
+			
+			case BUTTON_SWITCH:
+				if(!last_state) {
+					pressed = (pressed ? false : true);
+				}
+			break;
+			
+			case BUTTON_TIMED:
+				pressed = true;
+				time_left = time_limit;
+			break;
+			
+			default: assert(false);
+		}
+	
+		if(!last_state) {
+			//TODO: Play a sound effect/special effect here
 		}
 		last_state = true;	
 	}
 	else {
 		last_state = false;		
-		if(!toggleable) {
+		if(type == BUTTON_PRESS) {
 			pressed = false;
+		}
+	}
+	
+	if(type == BUTTON_TIMED && pressed) {
+		time_left -= dt;
+		
+		if(time_left < 0) {
+			time_left = 0;
+			pressed = false;
+			
+			//TODO: Play a sound for the button deactivating here
 		}
 	}
 }
@@ -156,10 +184,17 @@ void ObstacleEntity::init() {
 }
 
 void ObstacleEntity::tick(float dt) {
-	if(!active()) {
+	if((flags & OBSTACLE_NO_COLLIDE) ||
+		!active()) {
 		return;
 	}
-	process_collision(&puzzle->player.particle, dt);
+	
+	if(process_collision(&puzzle->player.particle, dt)) {
+		//Kill the player if we are deadly!
+		if(flags & OBSTACLE_DEADLY) {
+			puzzle->kill_player();
+		}
+	}
 }
 
 void ObstacleEntity::draw() {
@@ -173,17 +208,29 @@ void ObstacleEntity::draw() {
 	glPopMatrix();
 }
 
-void ObstacleEntity::process_collision(Particle* part, float dt) {
+bool ObstacleEntity::process_collision(Particle* part, float dt) {
 	
 	auto tinv = transform.inverse();
-	auto npos = tinv * part->coordinate.position;
+	auto npos = tinv * part->center();
 	auto grad = (transform.linear() * model->gradient(npos)).normalized();
-	auto spos = tinv * (part->coordinate.position + grad * part->radius);
 	
-	if((*model)(spos) > 0) {
-		part->apply_force(-grad * part->velocity.dot(grad) * 2. / dt);
+	if((*model)(npos) > -1e-6) {
+		part->apply_force(-grad * 100.0);
 		
-		//FIXME: Add a collision sound here maybe
+		//FIXME Add a collision sound
+		return true;
+	} else {	
+		auto spos = tinv * (part->coordinate.position + grad * part->radius);	
+		if((*model)(spos) > 0) {
+			float d = part->velocity.dot(grad);
+			if( d > 0 ) {
+				part->apply_force(-grad * part->velocity.dot(grad) * 2. / dt);
+				//FIXME: Add a collision sound
+			}
+			return true;
+		}
 	}
+	
+	return false;
 }
 

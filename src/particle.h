@@ -99,6 +99,13 @@ struct Particle {
 		return result;
 	}
 	
+	Eigen::Vector3f center() const {
+		if(coordinate.solid == NULL) {
+			return coordinate.position;
+		}
+		return coordinate.position + coordinate.interpolated_normal() * radius;
+	}
+	
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };
 

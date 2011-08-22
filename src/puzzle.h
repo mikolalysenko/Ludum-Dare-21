@@ -53,6 +53,9 @@ struct Puzzle {
 	void tick(float dt);
 	void draw();
 	
+	//Called when the player should die
+	void kill_player();
+	
 	void add_entity(Entity* e) {
 		e->puzzle = this;
 		entities.push_back(e);

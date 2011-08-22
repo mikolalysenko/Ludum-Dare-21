@@ -58,13 +58,15 @@ struct Level0 : public PuzzleGenerator {
 		//Add a button
 		auto button = new ButtonEntity(
 			level->closest_point(Vector3f(10, 10, 0)),
-			true);
+			BUTTON_TIMED,
+			10.f);
 		puzzle->add_entity(button);
 		
 		//Add a removable obstacle
 		auto obstacle = new ObstacleEntity(
 			get_artwork("player_model"),
-			Affine3f(Translation3f(0, -8, 0) * Scaling(5.f)),
+			Affine3f(Translation3f(0, -10, 0) * Scaling(5.f)),
+			0,
 			button);
 		puzzle->add_entity(obstacle);
 	}

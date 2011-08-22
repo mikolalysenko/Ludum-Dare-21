@@ -51,15 +51,27 @@ struct TeleporterEntity : public Entity {
 };
 
 //Buttons!  Can toggle walls and other stuff
+enum ButtonType {
+	BUTTON_PRESS,
+	BUTTON_SWITCH,
+	BUTTON_TIMED
+};
+
 struct ButtonEntity : public Entity {
-	bool pressed, toggleable, last_state;
+	
+	ButtonType type;
+	float time_limit, time_left;
+	bool pressed, last_state;
 	
 	ButtonEntity(
 		IntrinsicCoordinate const& coord,
-		bool toggle = false) :
+		ButtonType t = BUTTON_PRESS,
+		float time = 5.0f) :
 		Entity(coord),
+		type(t),
+		time_limit(time),
+		time_left(0.f),
 		pressed(false),
-		toggleable(toggle),
 		last_state(false) {}
 
 	virtual ~ButtonEntity();
@@ -69,8 +81,16 @@ struct ButtonEntity : public Entity {
 };
 
 //Obstacle entity
+enum ObstacleFlags {
+	OBSTACLE_NO_COLLIDE		= 1,
+	OBSTACLE_DEADLY			= 2,
+	OBSTACLE_LASER_REFLECT	= 4,
+	OBSTACLE_LASER_TRANSMIT	= 8,
+};
+
 struct ObstacleEntity : public Entity {
 	
+	int flags;
 	Solid* model;
 	Eigen::Affine3f transform;
 	ButtonEntity* button;
@@ -78,8 +98,10 @@ struct ObstacleEntity : public Entity {
 	ObstacleEntity(
 		Solid* m,
 		Eigen::Affine3f f,
+		int fl = 0,
 		ButtonEntity* b=NULL) :
 		Entity(IntrinsicCoordinate()),
+		flags(fl),
 		model(m),
 		transform(f),
 		button(b) {}
@@ -96,7 +118,7 @@ struct ObstacleEntity : public Entity {
 	}
 	
 	//Handles collision detection/response
-	void process_collision(Particle* particle, float dt);
+	bool process_collision(Particle* particle, float dt);
 };
 
 //Lasers!

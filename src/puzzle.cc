@@ -65,3 +65,12 @@ void Puzzle::draw() {
 	player.draw();
 }
 
+//Kills the player
+void Puzzle::kill_player() {
+
+	//TODO: Add some special effects here
+	
+	//Reset the puzzle
+	init();
+}
+

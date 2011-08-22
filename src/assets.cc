@@ -29,8 +29,9 @@ namespace Assets {
 #include "levels/level0.h"
 #include "levels/level1.h"
 
-//Player artwork
+//Artwork
 #include "artwork/player_art.h"
+#include "artwork/spikeball.h"
 
 };
 
@@ -62,14 +63,8 @@ void init_assets() {
 
 	//Create player artwork
 	{
-		PlayerModelFunc player_model;
-		PlayerStyleFunc player_style;
-		auto player_art = new Solid(
-			Vector3i(16, 16, 16),
-			Vector3f(-1, -1, -1),
-			Vector3f( 1,  1,  1));
-		setup_solid(*player_art, player_model, player_style);
-		artwork_database["player_model"] = player_art;
+		artwork_database["player_model"] = make_player();
+		artwork_database["spikeball"] = make_spikeball();
 	}
 }
 

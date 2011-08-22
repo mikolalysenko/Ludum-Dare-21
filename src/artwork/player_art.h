@@ -22,3 +22,15 @@ struct PlayerStyleFunc {
 	}
 };
 
+Solid* make_player() {
+	PlayerModelFunc player_model;
+	PlayerStyleFunc player_style;
+	auto player_art = new Solid(
+		Vector3i(16, 16, 16),
+		Vector3f(-1, -1, -1),
+		Vector3f( 1,  1,  1));
+	setup_solid(*player_art, player_model, player_style);
+	
+	return player_art;
+}
+

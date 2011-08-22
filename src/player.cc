@@ -206,14 +206,13 @@ void Player::set_gl_matrix() {
 
 void Player::draw() {
 	auto p = particle.coordinate.position;
-	auto n = particle.coordinate.interpolated_normal();
 
 	glPushMatrix();
-	auto c = p + n * (particle.radius + 0.1);
+	auto c = particle.center();
 	auto rot = AngleAxisf(particle.rotation);
 	glTranslatef(c[0], c[1], c[2]);
 	glRotatef(rot.angle() * (180./M_PI), rot.axis()[0], rot.axis()[1], rot.axis()[2]);
-	glScalef(2.*particle.radius,2.*particle.radius, 2.*particle.radius);
+	glScalef(2*particle.radius,2*particle.radius,2*particle.radius);
 	model->draw();
 	glPopMatrix();
 	
