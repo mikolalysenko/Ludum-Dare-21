@@ -30,9 +30,9 @@ struct Level0 : public PuzzleGenerator {
 		
 		//Create geometry
 		auto level = new Solid(
-			Vector3i( 64,  64,  64),
-			Vector3f(-10, -10, -10),
-			Vector3f( 10,  10,  10));
+			Vector3i( 128, 128, 128 ),
+			Vector3f(-8, -8, -8),
+			Vector3f( 8,  8,  8));
 		Level0Solid	level_func;
 		Level0Attr	attr_func;
 		setup_solid(*level, level_func, attr_func);

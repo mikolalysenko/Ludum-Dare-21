@@ -80,7 +80,7 @@ void Puzzle::draw() {
 		d.normalize();
 	}
 	Vector3f u = (player.camera_up - d * d.dot(player.camera_up)).normalized();
-	
+		
 	Vector3f lp = player.camera_position + (d + u) * (3*player.camera_height);
 	GLfloat light_pos[4];
 	light_pos[0] = lp[0];
