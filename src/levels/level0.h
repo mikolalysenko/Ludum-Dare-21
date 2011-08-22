@@ -53,6 +53,8 @@ struct Level0 : public PuzzleGenerator {
 				level->closest_point(Vector3f(0, cos(i), sin(i))*10.),
 				start_pt));
 		}
+		
+		puzzle->player.camera_height = 30;
 	}
 	
 	virtual void post_init(Puzzle* puzzle) {

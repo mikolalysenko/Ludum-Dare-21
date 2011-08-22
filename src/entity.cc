@@ -43,13 +43,19 @@ void TeleporterEntity::tick(float dt) {
 	auto p = &puzzle->player.particle;
 	float d = (p->coordinate.position - coordinate.position).norm();
 	if(p->coordinate.solid == coordinate.solid && d <= p->radius) {
+		//Update coordinate
 		p->coordinate = target_coordinate;
-		puzzle->player.shake_camera(1.0, 0.25);
 		
-		puzzle->player.button_pressed = false;		
+		//Update velocity
 		auto v_dir = target_coordinate.project_to_tangent_space(p->velocity).normalized();
 		p->velocity = p->velocity.norm() * v_dir;
 		
+		//Update camera position
+		auto n = p->coordinate.interpolated_normal();
+		puzzle->player.camera_position = p->coordinate.position + n * puzzle->player.camera_height;
+		
+		//Special effects
+		puzzle->player.shake_camera(1.0, 0.25);
 		play_sound_from_group(SOUND_GROUP_TELEPORT);
 	}
 }
