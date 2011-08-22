@@ -15,8 +15,7 @@
 #include "sound.h"
 #include "text.h"
 #include "menu.h"
-
-#include "player_model.h"
+#include "art.h"
 
 #include "levels/level0.h"
 
@@ -33,11 +32,6 @@ GLuint scene_display_list = 0;
 double fov=45., znear=1., zfar=1000.;
 
 //vector<Particle> particles;
-
-Solid player_model(
-	Vector3i(16, 16, 16),
-	Vector3f(-1,-1,-1),
-	Vector3f( 1, 1, 1));
 Player player;
 Puzzle puzzle;
 	
@@ -84,6 +78,9 @@ void init()
 {
 	//initialize random seed
 	srand(time(NULL));
+	
+	//Initialize artwork
+	init_artwork();
 	
 	//initialize text stuff
 	initialize_text();
@@ -154,21 +151,6 @@ void init()
 	//initialize level data
 	Level0::Level0 level_gen;
 	setup_puzzle(puzzle, level_gen, &player);
-	
-	/*
-	//Generate a bunch of random particles
-	for(int i=0; i<100; ++i) {
-		int t = rand() % puzzle.mesh.triangles().size();
-		particles.push_back(
-			Particle(
-				IntrinsicCoordinate(t,
-					puzzle.mesh.vertex(puzzle.mesh.triangle(t).v[rand()%3]).position,
-					&puzzle),
-				10.*Vector3f(0.5-drand48(), 0.5-drand48(), 0.5-drand48()),
-				Vector3f(drand48(), drand48(), drand48()),
-				(float)(drand48()*10.f) ));
-	}
-	*/
 }
 
 bool togglekey(int GLFWKey, int menukey)
@@ -236,12 +218,6 @@ void tick()
 	//if there is no menu showing, then tick the game forward. Otherwise, don't tick (so the game is paused)
 	if(currentmenu == NULL)
 	{
-		/*
-		for(int i=0; i<particles.size(); ++i) {
-			particles[i].integrate(dt);
-		}
-		*/
-		
 		player.tick(dt);
 		puzzle.tick(dt);
 	}
@@ -278,18 +254,6 @@ void draw() {
 		
 		//Draw the player
 		player.draw();
-		
-			/*
-		//Draw particles
-		glPointSize(5);
-		glBegin(GL_POINTS);
-		for(int i=0; i<particles.size(); ++i) {
-			auto p = particles[i];
-			glColor3f(p.color[0], p.color[1], p.color[2]);
-			glVertex3f(p.coordinate.position[0], p.coordinate.position[1], p.coordinate.position[2]);
-		}
-		glEnd();
-		*/
 	}
 
 	//text rendering should be the last thing we do in the render loop
@@ -329,7 +293,7 @@ void draw() {
 int initialize_libs()
 {
     glfwInit();
-    if (!glfwOpenWindow(800, 600, 8, 8, 8, 8, 16, 0, GLFW_WINDOW))
+    if (!glfwOpenWindow(640,480, 8, 8, 8, 8, 16, 0, GLFW_WINDOW))
         return 0;
 
 	if(!initialize_sound_driver())

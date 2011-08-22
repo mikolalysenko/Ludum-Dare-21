@@ -9,6 +9,7 @@
 
 #include "player.h"
 #include "puzzle.h"
+#include "art.h"
 
 using namespace std;
 using namespace Eigen;
@@ -37,6 +38,7 @@ Vector2f Player::project(Vector3f const& position) const {
 
 //Resets the player
 void Player::reset() {
+	model = get_artwork("player_model");
 	particle.coordinate = IntrinsicCoordinate(-1, Vector3f(0,0,0), NULL);
 	particle.velocity = Vector3f(1, 0, 0);
 	particle.forces = Vector3f(0, 0, 0);
@@ -81,29 +83,11 @@ void Player::input() {
 	}
 
 	button_pressed = nstate;
-    
-/*    
-    //Update camera rotation
-    if(button_pressed) {
-    	drotation = Quaternionf(
-    		mouse_state[1][0] * mouse_state[0][0] + mouse_state[1][1] * mouse_state[0][1] + w * w,
-    		w * (mouse_state[1][1] - mouse_state[0][1]),
-    		w * (mouse_state[0][0] - mouse_state[1][0]),
-            mouse_state[1][0] * mouse_state[0][1] - mouse_state[1][1] * mouse_state[0][0]);
-        
-    	force_rotation = (force_rotation * drotation).normalized();
-    }
-*/
 }
 
 void Player::tick(float dt) {
-
-
-
-	//Apply attractive force from camera
-	//particle.apply_force( force_rotation * Vector3f(0, -1, 0) );
+	//Apply player input force
 	if(button_pressed) {
-
 		//Reproject forces
 		force_up = particle.coordinate.project_to_tangent_space(force_up).normalized();
 		force_right = particle.coordinate.project_to_tangent_space(force_right);
@@ -114,11 +98,6 @@ void Player::tick(float dt) {
 			2.f * (mouse_state[1][1] - (float)viewport[1]) / (float)viewport[3] - 1.f);
 		
 		Vector3f force = dmouse[0] * force_right - dmouse[1] * force_up;
-
-		cout << "Force up = " << force_up << endl
-			 << "Force right = " << force_right << endl
-			 << "dmouse = " << dmouse << endl
-			 << "Applying force: " << force << endl;
 		
 		particle.apply_force(force);
 	}
@@ -126,7 +105,6 @@ void Player::tick(float dt) {
 	//Integrate position
 	particle.integrate(dt);
 
-	
 	//Compute target camera position and orientation
 	Vector3f
 		n = particle.coordinate.interpolated_normal(),
@@ -192,14 +170,6 @@ void Player::set_gl_matrix() {
 void Player::draw() {
 	auto p = particle.coordinate.position;
 	auto n = particle.coordinate.interpolated_normal();
-
-	/*
-	glPointSize(10);
-	glBegin(GL_POINTS);
-	glColor3f(1, 1, 1);
-	glVertex3f(p[0], p[1], p[2]);
-	glEnd();
-	*/
 
 	glPushMatrix();
 	auto c = p + n * particle.radius;
