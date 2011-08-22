@@ -4,9 +4,9 @@ struct Level2Solid {
 		
 		Cell result;
 		result.density = 
-			(cos(v[0] * 2.*M_PI / 15.) +
-			 cos(v[1] * 2.*M_PI / 15.) +
-			 cos(v[2] * 2.*M_PI / 15.));
+			-(cos(v[0] * 2.*M_PI / 20.) +
+			 cos(v[1] * 2.*M_PI / 20.) +
+			 cos(v[2] * 2.*M_PI / 20.));
 		
 		result.friction = 1./4.;
 		
@@ -43,7 +43,7 @@ struct Level2 : public PuzzleGenerator {
 		auto level = new Solid(
 			Vector3i( 128, 128, 128 ),
 			Vector3f(-30, -30, -30),
-			Vector3f( 30,  30,  30));
+			Vector3f( 30. +60./128., 30.+60./128., 30.+60./128.));
 		Level2Solid	level_func;
 		Level2Attr	attr_func;
 		setup_solid(*level, level_func, attr_func);
@@ -56,6 +56,7 @@ struct Level2 : public PuzzleGenerator {
 		
 		auto end_pt = level->closest_point(Vector3f(0, 0, 0));
 		puzzle->add_entity(new LevelExitEntity(end_pt));
+		
 		
 		//Add patroling goons
 		puzzle->add_entity(patrol_spike_monster({
@@ -86,14 +87,12 @@ struct Level2 : public PuzzleGenerator {
 			level->closest_point(Vector3f(-29, -31,  29)),
 		}));
 
-
 		puzzle->add_entity(patrol_spike_monster({
 			level->closest_point(Vector3f(31, -29, -29)),
 			level->closest_point(Vector3f(31, 29, -29)),
 			level->closest_point(Vector3f(31, 29,  29)),
 			level->closest_point(Vector3f(31, -29,  29)),
 		}));
-		
 	}
 };
 

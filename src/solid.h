@@ -133,13 +133,23 @@ template<typename ImplicitFunc_t, typename StyleFunc_t>
 void setup_solid(Solid& solid, ImplicitFunc_t& func, StyleFunc_t& style_func) {
 	using namespace Eigen;
 	
+	
 	//Fill in data
 	Cell* ptr = &solid.data[0];
 	Eigen::Array3f step = (solid.upper_bound - solid.lower_bound).array() / (solid.resolution.array()).cast<float>();
-	for(float z=solid.lower_bound[2]; z<solid.upper_bound[2]; z+=step[2])
-	for(float y=solid.lower_bound[1]; y<solid.upper_bound[1]; y+=step[1])
-	for(float x=solid.lower_bound[0]; x<solid.upper_bound[0]; x+=step[0]) {
-		*(ptr++) = func( Vector3f(x, y, z) );
+	
+	Vector3f lb = solid.lower_bound;
+	for(int iz = solid.resolution[2]-1; iz>=0; --iz) {
+		lb[1] = solid.lower_bound[1];
+		for(int iy = solid.resolution[1]-1; iy>=0; --iy) {
+			lb[0] = solid.lower_bound[0];
+			for(int ix = solid.resolution[0]-1; ix>=0; --ix) {
+				*(ptr++) = func( lb );
+				lb[0] += step[0];			
+			}
+			lb[1] += step[1];
+		}
+		lb[2] += step[2];
 	}
 	
 	//Rebuild mesh
