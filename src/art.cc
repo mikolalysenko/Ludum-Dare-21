@@ -31,7 +31,6 @@ struct PlayerStyleFunc {
 	}
 };
 
-
 //Initialize all the artwork
 void init_artwork() {
 	//Create player artwork
@@ -47,6 +46,7 @@ void init_artwork() {
 	}
 }
 
+//Retrieve some artwork from the database
 Solid* get_artwork(const char* asset_name) {
 	if(artwork_database.find(asset_name) != artwork_database.end()) {
 		return artwork_database[asset_name];

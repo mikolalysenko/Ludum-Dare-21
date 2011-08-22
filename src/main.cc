@@ -131,24 +131,15 @@ void init()
 	//TODO: in the future, this should be "showmenu(mainmenu)". Right now, I am defaulting it to just jump right into the game to make development easier (so you don't have to go through menus to test)
 	showmenu(NULL);
 
+	//Create player model
+	PlayerModelFunc player_func;
+	PlayerStyleFunc player_attr;
+	setup_solid(player_model, player_func, player_attr);
+	player.model = &player_model;
+	
 	//initialize level data
 	Level0::Level0 level_gen;
 	setup_puzzle(puzzle, level_gen, &player);
-	
-	/*
-	//Generate a bunch of random particles
-	for(int i=0; i<100; ++i) {
-		int t = rand() % puzzle.mesh.triangles().size();
-		particles.push_back(
-			Particle(
-				IntrinsicCoordinate(t,
-					puzzle.mesh.vertex(puzzle.mesh.triangle(t).v[rand()%3]).position,
-					&puzzle),
-				10.*Vector3f(0.5-drand48(), 0.5-drand48(), 0.5-drand48()),
-				Vector3f(drand48(), drand48(), drand48()),
-				(float)(drand48()*10.f) ));
-	}
-	*/
 }
 
 bool togglekey(int GLFWKey, int menukey)
@@ -216,12 +207,6 @@ void tick()
 	//if there is no menu showing, then tick the game forward. Otherwise, don't tick (so the game is paused)
 	if(currentmenu == NULL)
 	{
-		/*
-		for(int i=0; i<particles.size(); ++i) {
-			particles[i].integrate(dt);
-		}
-		*/
-		
 		player.tick(dt);
 		puzzle.tick(dt);
 	}
@@ -258,18 +243,6 @@ void draw() {
 		
 		//Draw the player
 		player.draw();
-		
-			/*
-		//Draw particles
-		glPointSize(5);
-		glBegin(GL_POINTS);
-		for(int i=0; i<particles.size(); ++i) {
-			auto p = particles[i];
-			glColor3f(p.color[0], p.color[1], p.color[2]);
-			glVertex3f(p.coordinate.position[0], p.coordinate.position[1], p.coordinate.position[2]);
-		}
-		glEnd();
-		*/
 	}
 
 	//text rendering should be the last thing we do in the render loop
