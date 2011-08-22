@@ -99,11 +99,17 @@ struct Particle {
 		return result;
 	}
 	
+	//The center of the particle (different than the coordinate position, which is clamped to a surface)
 	Eigen::Vector3f center() const {
 		if(coordinate.solid == NULL) {
 			return coordinate.position;
 		}
 		return coordinate.position + coordinate.interpolated_normal() * radius;
+	}
+	
+	//Checks if two particles collide
+	bool check_collide(Particle const& other) const {
+		return (other.center() - center()).norm() < other.radius + radius;
 	}
 	
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

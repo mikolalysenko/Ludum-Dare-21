@@ -6,6 +6,7 @@
 
 //The level start coordinate entity, initializes player
 struct LevelStartEntity : public Entity {
+	IntrinsicCoordinate coordinate;
 	float camera_stiffness, camera_distance, camera_height;
 
 	LevelStartEntity(
@@ -13,7 +14,7 @@ struct LevelStartEntity : public Entity {
 		float height = 25.0,
 		float distance = 1.0,
 		float stiffness = 2.0) :
-		Entity(coord),
+		coordinate(coord),
 		camera_height(height),
 		camera_distance(distance),
 		camera_stiffness(stiffness) {}
@@ -25,8 +26,10 @@ struct LevelStartEntity : public Entity {
 
 //Level exit entity object
 struct LevelExitEntity : public Entity {
+	IntrinsicCoordinate coordinate;
+
 	LevelExitEntity(IntrinsicCoordinate const& coord) :
-		Entity(coord) {}
+		coordinate(coord) {}
 	virtual ~LevelExitEntity();
 	virtual void init();
 	virtual void tick(float dt);
@@ -36,12 +39,12 @@ struct LevelExitEntity : public Entity {
 //A teleporter entity
 struct TeleporterEntity : public Entity {
 
-	IntrinsicCoordinate target_coordinate;
+	IntrinsicCoordinate coordinate, target_coordinate;
 
 	TeleporterEntity(
 		IntrinsicCoordinate const& src,
 		IntrinsicCoordinate const& dst) :
-			Entity(src),
+			coordinate(src),
 			target_coordinate(dst) {}
 
 	virtual ~TeleporterEntity();
@@ -59,6 +62,7 @@ enum ButtonType {
 
 struct ButtonEntity : public Entity {
 	
+	IntrinsicCoordinate coordinate;
 	ButtonType type;
 	float time_limit, time_left;
 	bool pressed, last_state;
@@ -67,7 +71,7 @@ struct ButtonEntity : public Entity {
 		IntrinsicCoordinate const& coord,
 		ButtonType t = BUTTON_PRESS,
 		float time = 5.0f) :
-		Entity(coord),
+		coordinate(coord),
 		type(t),
 		time_limit(time),
 		time_left(0.f),
@@ -100,7 +104,6 @@ struct ObstacleEntity : public Entity {
 		Eigen::Affine3f f,
 		int fl = 0,
 		ButtonEntity* b=NULL) :
-		Entity(IntrinsicCoordinate()),
 		flags(fl),
 		model(m),
 		transform(f),
@@ -121,20 +124,37 @@ struct ObstacleEntity : public Entity {
 	bool process_collision(Particle* particle, float dt);
 };
 
+//Spike monster!
+struct SpikeballEntity : public Entity {
+
+	Solid* model;
+	Particle physics;
+	float vision_radius, speed;
+	
+	SpikeballEntity(
+		IntrinsicCoordinate const& position,
+		float speed = 1.0,
+		float vision = 20.0);
+		
+	virtual ~SpikeballEntity();
+	virtual void init();
+	virtual void tick(float dt);
+	virtual void draw();
+};
+
 //Lasers!
 struct LaserEntity : public Entity {
 
-	std::vector<Eigen::Vector3f> beam;
+	IntrinsicCoordinate coordinate;
 	float beam_length, beam_step;
 	Eigen::Vector3f beam_direction;
-
 	
 	LaserEntity(
 		IntrinsicCoordinate const& coord,
 		float length,
 		float step,
 		Eigen::Vector3f direction) :
-		Entity(coord),
+		coordinate(coord),
 		beam_length(length),
 		beam_step(step),
 		beam_direction(direction) {}

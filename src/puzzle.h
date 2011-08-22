@@ -11,11 +11,9 @@
 
 //The game entity interface
 struct Entity {
-	IntrinsicCoordinate coordinate;
 	struct Puzzle*	puzzle;
 
-	Entity(IntrinsicCoordinate const& coord) :
-		coordinate(coord),
+	Entity() :
 		puzzle(NULL) {}
 
 	virtual ~Entity() {}
