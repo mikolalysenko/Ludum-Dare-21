@@ -25,6 +25,8 @@ using namespace Mesh;
 
 namespace App {
 
+int start_level = 0;
+
 bool running = true;
 bool ingame = true;
 
@@ -150,7 +152,7 @@ void init()
 	//load_sound_in_group("data/teleport3.wav", SOUND_GROUP_MENU_CHANGE);*/
 	
 	//initialize level data
-	puzzle.setup(get_level(2));
+	puzzle.setup(get_level(start_level));
 }
 
 bool togglekey(int GLFWKey, int menukey)
@@ -305,6 +307,10 @@ int main(int argc, char* argv[])
 	{
 		glfwTerminate();
 		return -1;
+	}
+	
+	if(argc > 1) {
+		App::start_level = atoi(argv[1]);
 	}
 	
     glfwSetWindowTitle("Help!  I'm stuck in a compact 2D Riemannian manifold!");

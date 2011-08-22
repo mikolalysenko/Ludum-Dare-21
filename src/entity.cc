@@ -198,7 +198,7 @@ void ButtonEntity::tick(float dt) {
 void ButtonEntity::draw() {
 	glDisable(GL_LIGHTING);
 
-	auto p = coordinate.position + coordinate.interpolated_normal();
+	auto p = coordinate.position + coordinate.interpolated_normal() * 0.25;
 	glPointSize(10);
 	glBegin(GL_POINTS);
 	if(pressed) {

@@ -1,15 +1,16 @@
-struct LevelXXXSolid {
+struct Level3Solid {
 	Cell operator()(Eigen::Vector3f v) const {
 		using namespace Eigen;
 		
 		Cell result;
-		result.density = sphere(v, 50.f);
+		result.density = 
+		-(cos(v[0]) + cos(v[1]) + cos(v[2])) + sphere(v, 30) * 0.1;
 		result.friction = 1.0/4.0;
 		return result;
 	}
 };
 
-struct LevelXXXAttr {
+struct Level3Attr {
 	Vertex operator()(Eigen::Vector3f const& v) const {
 		using namespace Eigen;
 		
@@ -21,9 +22,9 @@ struct LevelXXXAttr {
 	}
 };
 
-struct LevelTemplate : public PuzzleGenerator {
+struct Level3 : public PuzzleGenerator {
 
-	virtual ~LevelTemplate() {}
+	virtual ~Level3() {}
 
 	virtual void setup(Puzzle* puzzle) {
 		using namespace Eigen;
@@ -33,8 +34,8 @@ struct LevelTemplate : public PuzzleGenerator {
 			Vector3i( 128, 128, 128 ),
 			Vector3f(-8, -8, -8),
 			Vector3f( 8,  8,  8));
-		LevelXXXSolid	level_func;
-		LevelXXXAttr	attr_func;
+		Level3Solid	level_func;
+		Level3Attr	attr_func;
 		setup_solid(*level, level_func, attr_func);
 		
 		puzzle->add_solid(level);
