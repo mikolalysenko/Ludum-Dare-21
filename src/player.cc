@@ -95,18 +95,24 @@ void clip_camera(
 	Affine3f const& transform) {
 
 	auto tinv = transform.inverse();
-	auto p = tinv * local_position;
-	auto q = tinv * camera_position;
-	
-	if( (*s)(q) > -1e6 )
-		return;
+	auto q = tinv * local_position;
+	auto p = tinv * camera_position;
 	
 	float lo=0, hi=1.0, m;
+	for(hi=0.05; hi<=1.0; hi+=1./32.) {
+		auto x = q*(1.-hi) + p*hi;
+		if( (*s)(x) > -1e-6 ) {
+			break;
+		}
+	}
+	
+	hi = min(hi, 1.f);
+	
 	while(abs(lo - hi) > 1e-6) {
 		m = 0.5 * (lo + hi);
 		
 		auto x = q*(1.-m) + p*m;
-		if( (*s)(x) > -1e6 ) {
+		if( (*s)(x) > -1e-6 ) {
 			hi = m;
 		}
 		else {
@@ -114,7 +120,7 @@ void clip_camera(
 		}
 	}
 	
-	camera_position = camera_position*(1.-m) + local_position*m;
+	camera_position = camera_position*m + local_position*(1.-m);
 }
 
 

@@ -4,12 +4,11 @@ struct Level2Solid {
 		
 		Cell result;
 		result.density = 
-			sphere(v, 50.f) +
-			sin(v[0] * 0.1) +
-			sin(v[1] * 0.1) +
-			sin(v[2] * 0.1);
+			(sin(v[0] * 0.5) +
+			sin(v[1] * 0.5) +
+			sin(v[2] * 0.5));
 		
-		result.friction = 1.0/4.0;
+		result.friction = 1./4.;
 		
 		return result;
 	}
@@ -21,7 +20,7 @@ struct Level2Attr {
 		
 		Vertex result;
 		result.position = v;
-		result.color = v;
+		result.color = Vector3f(drand48(), drand48(), drand48());
 		
 		return result;
 	}
@@ -37,8 +36,8 @@ struct Level2 : public PuzzleGenerator {
 		//Create geometry
 		auto level = new Solid(
 			Vector3i( 128, 128, 128 ),
-			Vector3f(-8, -8, -8),
-			Vector3f( 8,  8,  8));
+			Vector3f(-30, -30, -30),
+			Vector3f( 30,  30,  30));
 		Level2Solid	level_func;
 		Level2Attr	attr_func;
 		setup_solid(*level, level_func, attr_func);
