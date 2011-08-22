@@ -3,7 +3,7 @@ struct Level0Solid {
 		using namespace Eigen;
 		
 		Cell result;
-		result.density = 50.0 - v.dot(v);
+		result.density = sphere(v, 50.f);
 		result.friction = 1.0/4.0;
 		return result;
 	}

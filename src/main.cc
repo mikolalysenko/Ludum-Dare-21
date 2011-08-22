@@ -57,6 +57,9 @@ void exit(void* data)
 
 void showmenu(void* data)
 {
+	if(currentmenu == NULL && data != NULL)
+		play_sound_from_group(SOUND_GROUP_MENU_SHOW);
+	
 	currentmenu = (Menu*)data;
 	
 	if(currentmenu != NULL)
@@ -141,6 +144,7 @@ void init()
 	//menu sounds
 	load_sound_in_group("data/menuoption.wav", SOUND_GROUP_MENU_CHANGE);
 	load_sound_in_group("data/menuselect.wav", SOUND_GROUP_MENU_SELECT);
+	load_sound_in_group("data/showmenu.wav", SOUND_GROUP_MENU_SHOW);
 	
 	//sound for changing menu
 	//load_sound_in_group("data/teleport3.wav", SOUND_GROUP_MENU_CHANGE);*/

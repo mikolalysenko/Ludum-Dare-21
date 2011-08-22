@@ -4,9 +4,9 @@ struct Level1Solid {
 		
 		Cell result;
 		result.density = 
-		max(torus(Vector3f(v[0], v[1] - 9, v[2]), 7, 9),
-		max(torus(Vector3f(v[0], v[1] + 9, v[2]), 7, 9),
-		torus(Vector3f(v[2], v[1], v[0]), 7, 9)));
+		max(torus(Vector3f(v[0], v[1] - 9, v[2]), 8, 4),
+		max(torus(Vector3f(v[0], v[1] + 9, v[2]), 8, 4),
+		torus(Vector3f(v[2], v[1], v[0]), 8, 4)));
 		//float val = 2 - sqrt(v[0] * v[0] + v[1] * v[1]);
 		//result.density = val * val + v[2] * v[2] - 64;
 		result.friction = 1.0/4.0;
