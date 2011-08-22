@@ -49,6 +49,7 @@ struct Level0 : public PuzzleGenerator {
 				
 				
 		auto rand_tri = (rand() % level->mesh.triangles().size());
+		tri = level->mesh.triangle(rand_tri);
 		puzzle->add_entity(
 			new LevelExitEntity(
 				IntrinsicCoordinate(
