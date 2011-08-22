@@ -5,7 +5,9 @@
 #include <Eigen/Core>
 #include <GL/glfw.h>
 #include <mesh/mesh.h>
+
 #include "solid.h"
+#include "surface_coordinate.h"
 
 using namespace std;
 using namespace Eigen;
@@ -53,4 +55,28 @@ void Solid::setup_data() {
 void Solid::draw() {
     glCallList(display_list);
 }
+
+IntrinsicCoordinate Solid::random_point() {
+
+	if(mesh.triangles().size() == 0) {
+		return IntrinsicCoordinate(-1, Vector3f(0,0,0), NULL);
+	}
+
+
+	int rnd_tri = rand() % mesh.triangles().size();
+	auto tr = mesh.triangle(rnd_tri);
+	
+	float a = drand48();
+	float b = (1. - a) * drand48();
+	float c = 1. - a - b;
+	
+	auto p = mesh.vertex(tr.v[0]).position*a + 
+			 mesh.vertex(tr.v[1]).position*b +
+			 mesh.vertex(tr.v[2]).position*c;
+	
+	return IntrinsicCoordinate(rnd_tri, p, this);
+}
+
+
+struct IntrinsicCoordiante closest_point(Eigen::Vector3f const& p);
 

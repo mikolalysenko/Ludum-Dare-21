@@ -40,22 +40,8 @@ struct Level0 : public PuzzleGenerator {
 		puzzle->add_solid(level);
 		
 		//Create start location
-		auto tri = level->mesh.triangle(0);
-		puzzle->player.particle.coordinate =
-			IntrinsicCoordinate(
-				0,
-				level->mesh.vertex(tri.v[0]).position,
-				level);
-				
-				
-		auto rand_tri = (rand() % level->mesh.triangles().size());
-		tri = level->mesh.triangle(rand_tri);
-		puzzle->add_entity(
-			new LevelExitEntity(
-				IntrinsicCoordinate(
-					rand_tri,
-					level->mesh.vertex(tri.v[0]).position,
-					level)));
+		puzzle->player.particle.coordinate = level->random_point();
+		puzzle->add_entity(new LevelExitEntity(level->random_point()));
 	}
 	
 	virtual void post_init(Puzzle* puzzle) {

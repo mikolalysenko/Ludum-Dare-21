@@ -45,6 +45,10 @@ struct Solid {
 	void setup_data();
 	void draw();
 	
+	//Coordinate functions
+	struct IntrinsicCoordinate random_point();
+	struct IntrinsicCoordiante closest_point(Eigen::Vector3f const& p);
+	
 	bool coordinate_parts(
 		Eigen::Vector3f v,
 		Eigen::Vector3i& iv,
@@ -152,6 +156,9 @@ void setup_solid(Solid& solid, ImplicitFunc_t& func, StyleFunc_t& style_func) {
 	//Generate display/collision stuff
 	solid.setup_data();
 }
+
+//Forward reference
+#include "surface_coordinate.h"
 
 #endif
 
