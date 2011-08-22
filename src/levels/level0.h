@@ -1,14 +1,3 @@
-#ifndef LEVELS_H
-#define LEVELS_H
-
-#include <cmath>
-
-#include "solid.h"
-#include "surface_coordinate.h"
-#include "puzzle.h"
-
-namespace Level0 {
-
 struct Level0Solid {
 	Cell operator()(Eigen::Vector3f v) const {
 		using namespace Eigen;
@@ -32,9 +21,11 @@ struct Level0Attr {
 	}
 };
 
-//Builds level 0
-struct Level0 {
-	void operator()(Puzzle& puzzle) const {
+struct Level0 : public PuzzleGenerator {
+
+	virtual ~Level0() {}
+
+	virtual void setup(Puzzle* puzzle) {
 		using namespace Eigen;
 		
 		//Create geometry
@@ -46,19 +37,21 @@ struct Level0 {
 		Level0Attr	attr_func;
 		setup_solid(*level, level_func, attr_func);
 		
-		puzzle.add_solid(level);
+		puzzle->add_solid(level);
 		
 		//Create start location
+		
 		auto tri = level->mesh.triangle(0);
-		puzzle.add_entity(new StartEntity(
+		puzzle->add_entity(new StartEntity(
 			IntrinsicCoordinate(
 				0,
 				level->mesh.vertex(tri.v[0]).position,
 				level)) );
 	}
+	
+	virtual void post_init(Puzzle* puzzle) {
+	
+		//Nothing here for now
+	}
 };
-
-};
-
-#endif
 

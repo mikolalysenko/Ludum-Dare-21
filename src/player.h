@@ -28,11 +28,14 @@ struct Player {
 	Particle particle;
 	
 	//Puzzle data
-	struct Puzzle* puzzle;
+	const struct Puzzle* puzzle;
 
 	//Conversion between window coordinates
 	Eigen::Vector3f unproject(Eigen::Vector2f const& window) const;
 	Eigen::Vector2f project(Eigen::Vector3f const& position) const;
+
+	//Create player
+	Player(Puzzle* p) : puzzle(p) {}
 
 	//Event handlers
 	void reset();
