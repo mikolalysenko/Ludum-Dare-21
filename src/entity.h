@@ -7,7 +7,7 @@
 struct LevelExitEntity : public Entity {
 	LevelExitEntity(IntrinsicCoordinate const& coord) :
 		Entity(coord) {}
-	virtual ~LevelExitEntity() {}
+	virtual ~LevelExitEntity();
 	virtual void init();
 	virtual void tick(float dt);
 	virtual void draw();

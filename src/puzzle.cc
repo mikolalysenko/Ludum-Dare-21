@@ -21,23 +21,16 @@ void Puzzle::clear() {
 	}
 	solids.clear();
 	entities.clear();
+	
+	//Turn off level complete
+	level_complete = false;
 }
 
 //Initializes a level
 void Puzzle::init() {
-
 	//Initialize entities
 	for(int i=0; i<entities.size(); ++i) {
 		entities[i]->init();
-	}
-
-	//Set initial position and camera
-	for(int i=0; i<entities.size(); ++i) {
-		auto ptr = dynamic_cast<StartEntity*>(entities[i]);
-		if(ptr == NULL)
-			continue;
-		player.particle.coordinate = ptr->coordinate;
-		break;
 	}
 }
 

@@ -26,20 +26,6 @@ struct Entity {
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };
 
-//Special entity that sets position player start position
-struct StartEntity : public Entity {
-	
-	StartEntity(IntrinsicCoordinate const& coord) :
-		Entity(coord) {}
-	
-	virtual ~StartEntity() {}
-	virtual void init() {}
-	virtual void tick(float dt) {}
-	virtual void draw() {}
-
-	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-};
-
 //A puzzle generator object
 struct PuzzleGenerator {
 
@@ -55,6 +41,7 @@ struct Puzzle {
 	std::vector<Solid*>	solids;
 	std::vector<Entity*> entities;
 	Player player;
+	bool level_complete;
 
 	Puzzle() : player(this) {}
 	~Puzzle() { clear(); }
