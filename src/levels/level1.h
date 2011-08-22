@@ -43,13 +43,12 @@ struct Level1 : public PuzzleGenerator {
 		puzzle->add_solid(level);
 		
 		//Create start location
-		
 		auto tri = level->mesh.triangle(0);
-		puzzle->add_entity(new StartEntity(
+		puzzle->player.particle.coordinate =
 			IntrinsicCoordinate(
 				0,
 				level->mesh.vertex(tri.v[0]).position,
-				level)) );
+				level);
 	}
 	
 	virtual void post_init(Puzzle* puzzle) {
