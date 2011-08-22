@@ -23,6 +23,7 @@ using namespace Eigen;
 
 namespace Assets {
 
+#include "shapes.h"
 	
 //Level data
 #include "levels/level0.h"
