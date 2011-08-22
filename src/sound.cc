@@ -22,6 +22,11 @@ int play_sound_from_group(int group, bool looping, float rate)
 
 AudioDriver driver;
 
+void update_rate(int stream, float rate)
+{
+	driver.update_stream_rate(stream, rate);
+}
+
 void mix_audio_c(void *drv, Uint8 *stream, int len)
 {
 	//not really necessary, since driver is a singleton class and it's defined above, but I'm doing this anyway
@@ -324,4 +329,23 @@ bool AudioDriver::set_format(int freq, bool stereo)
 		sounds[x]->set_format(curfmt, streams);
 	
 	return true;
+}
+
+int AudioDriver::get_stream_from_index(int stream)
+{
+	for(int x = 0; x < MAX_STREAMS; x++)
+	{
+		if(streams[x].index == stream)
+			return x;
+	}
+	return -1;
+}
+
+void AudioDriver::update_stream_rate(int stream, float rate)
+{
+	int i = get_stream_from_index(stream);
+	if(i == -1)
+		return;
+	
+	streams[i]->rate = rate;
 }

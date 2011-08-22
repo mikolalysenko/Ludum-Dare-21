@@ -21,6 +21,7 @@ int load_sound(const char* path);
 int load_sound_in_group(const char* path, int group);
 int play_sound_from_group(int group, bool looping = false, float rate = 1);
 int play_sound(int i, bool looping = false, float rate = 1);
+void update_rate(int stream, float rate);
 
 class Sound;
 class AudioStream;
@@ -72,6 +73,7 @@ class AudioDriver
 		int load_sound_from_file(const char* path);
 		int play_sound_object(int i, bool looping = false, float rate = 1);
 		void stop_stream(int i);
+		void update_stream_rate(int stream, float rate);
 	
 	private:
 		bool loaded;
@@ -82,6 +84,7 @@ class AudioDriver
 		SDL_AudioSpec curfmt;
 	
 		int get_free_stream();
+		int get_stream_from_index(int);
 	
 		std::vector<Sound*> sounds;
 		AudioStream* streams[MAX_STREAMS];
