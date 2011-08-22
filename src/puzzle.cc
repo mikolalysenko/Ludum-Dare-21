@@ -5,6 +5,7 @@ void Puzzle::setup(PuzzleGenerator* generator) {
 	assert(generator != NULL);
 	
 	clear();
+	player.reset();
 	generator->setup(this);
 	init();
 	generator->post_init(this);
@@ -20,7 +21,6 @@ void Puzzle::clear() {
 	}
 	solids.clear();
 	entities.clear();
-	player.reset();
 }
 
 //Initializes a level
