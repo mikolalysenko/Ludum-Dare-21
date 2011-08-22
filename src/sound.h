@@ -12,8 +12,10 @@
 
 #define MAX_STREAMS 32
 
-#define SOUND_GROUP_CYMBAL 0
-#define SOUND_GROUP_LAST 1
+#define SOUND_GROUP_TELEPORT 0
+#define SOUND_GROUP_MENU_CHANGE 1
+#define SOUND_GROUP_MENU_SELECT 2
+#define SOUND_GROUP_LAST 3
 
 int initialize_sound_driver();
 bool set_sound_format(int freq, bool stereo);

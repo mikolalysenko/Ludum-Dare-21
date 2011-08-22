@@ -15,14 +15,15 @@
 #include "solid.h"
 #include "surface_coordinate.h"
 #include "puzzle.h"
-#include "entity.h"
 #include "assets.h"
+#include "entity.h"
 
 using namespace std;
 using namespace Eigen;
 
 namespace Assets {
 
+	
 //Level data
 #include "levels/level0.h"
 #include "levels/level1.h"

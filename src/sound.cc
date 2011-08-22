@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-std::vector<std::vector<int>> soundgroup(SOUND_GROUP_LAST);
+std::vector<int> soundgroup[SOUND_GROUP_LAST];
 
 int load_sound_in_group(const char* path, int group)
 {
@@ -14,6 +14,9 @@ int load_sound_in_group(const char* path, int group)
 
 int play_sound_from_group(int group, bool looping, float rate)
 {
+	if (soundgroup[group].size() == 0)
+		return -1;
+	
 	int i = rand();
 	int num = i % soundgroup[group].size();
 	

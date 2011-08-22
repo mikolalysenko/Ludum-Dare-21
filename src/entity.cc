@@ -7,6 +7,7 @@
 
 #include "solid.h"
 #include "entity.h"
+#include "sound.h"
 
 using namespace std;
 using namespace Eigen;
@@ -48,6 +49,8 @@ void TeleporterEntity::tick(float dt) {
 		puzzle->player.button_pressed = false;		
 		auto v_dir = target_coordinate.project_to_tangent_space(p->velocity).normalized();
 		p->velocity = p->velocity.norm() * v_dir;
+		
+		play_sound_from_group(SOUND_GROUP_TELEPORT);
 	}
 }
 

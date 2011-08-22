@@ -133,15 +133,17 @@ void init()
 	//TODO: in the future, this should be "showmenu(mainmenu)". Right now, I am defaulting it to just jump right into the game to make development easier (so you don't have to go through menus to test)
 	showmenu(NULL);
 
-	//sound stuff
-	//load_sound_in_group("data/test1.wav", SOUND_GROUP_CYMBAL);
-	//load_sound_in_group("data/test2.wav", SOUND_GROUP_CYMBAL);
-	load_sound_in_group("data/test3.wav", SOUND_GROUP_CYMBAL);
+	//teleporter sounds
+	load_sound_in_group("data/teleport1.wav", SOUND_GROUP_TELEPORT);
+	load_sound_in_group("data/teleport2.wav", SOUND_GROUP_TELEPORT);
+	load_sound_in_group("data/teleport3.wav", SOUND_GROUP_TELEPORT);
 	
-	/*play_sound_from_group(SOUND_GROUP_CYMBAL, true, 0.5);
-	play_sound_from_group(SOUND_GROUP_CYMBAL, true, 1);
-	play_sound_from_group(SOUND_GROUP_CYMBAL, true, 1.5);
-	play_sound_from_group(SOUND_GROUP_CYMBAL, true);*/
+	//menu sounds
+	load_sound_in_group("data/menuoption.wav", SOUND_GROUP_MENU_CHANGE);
+	load_sound_in_group("data/menuselect.wav", SOUND_GROUP_MENU_SELECT);
+	
+	//sound for changing menu
+	//load_sound_in_group("data/teleport3.wav", SOUND_GROUP_MENU_CHANGE);*/
 	
 	//initialize level data
 	puzzle.setup(get_level(1));
@@ -213,11 +215,6 @@ void tick()
 	if(currentmenu == NULL)
 	{
 		puzzle.tick(dt);
-
-		//Check for game over
-		if(puzzle.level_complete) {
-			endgame(NULL);
-		}
 	}
 }
 

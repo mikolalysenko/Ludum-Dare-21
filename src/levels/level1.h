@@ -3,8 +3,10 @@ struct Level1Solid {
 		using namespace Eigen;
 		
 		Cell result;
-		float val = 8 - sqrt(v[0] * v[0] + v[1] * v[1]);
-		result.density = -(val * val + v[2] * v[2] - 4);
+		/*result.density = 
+		max(torus(Vector3f(v[0], v[1] - 9, v[2]), 7, 9),
+		max(torus(Vector3f(v[0], v[1] + 9, v[2]), 7, 9),
+		torus(Vector3f(v[2], v[1], v[0]), 7, 9)));*/
 		//float val = 2 - sqrt(v[0] * v[0] + v[1] * v[1]);
 		//result.density = val * val + v[2] * v[2] - 64;
 		result.friction = 1.0/4.0;
@@ -33,9 +35,9 @@ struct Level1 : public PuzzleGenerator {
 		
 		//Create geometry
 		auto level = new Solid(
-			Vector3i( 64,  64,  64),
-			Vector3f(-10, -10, -10),
-			Vector3f( 10,  10,  10));
+			Vector3i( 64,  256,  64),
+			Vector3f(-11, -25, -11),
+			Vector3f( 11,  25,  11));
 		Level1Solid	level_func;
 		Level1Attr	attr_func;
 		setup_solid(*level, level_func, attr_func);

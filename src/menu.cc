@@ -2,6 +2,8 @@
 
 #include "text.h"
 
+#include "sound.h"
+
 #include <GL/glfw.h>
 
 Menu::Menu(const char* t)
@@ -25,6 +27,8 @@ void Menu::next_option()
 	curoption++;
 	if(curoption >= options.size())
 		curoption = options.size() - 1;
+	else
+		play_sound_from_group(SOUND_GROUP_MENU_CHANGE);
 }
 
 void Menu::prev_option()
@@ -32,6 +36,8 @@ void Menu::prev_option()
 	curoption--;
 	if(curoption < 0)
 		curoption = 0;
+	else
+		play_sound_from_group(SOUND_GROUP_MENU_CHANGE);
 }
 
 void Menu::select_option()
@@ -42,6 +48,7 @@ void Menu::select_option()
 	
 	if(options[curoption].cb != NULL)
 	{
+		play_sound_from_group(SOUND_GROUP_MENU_SELECT);
 		options[curoption].cb(options[curoption].data);
 	}
 }
