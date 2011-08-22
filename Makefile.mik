@@ -129,6 +129,12 @@ exe = $(EXE)
 deps_suffix = d
 deps := $(objs:.o=.$(deps_suffix))
 
+# To detect goal changes (for instance from GOAL_DEBUG to GOAL_EXE)
+# between invocations, this makefile creates an empty file (the goal flag
+# file) which suffix is the goal name.
+goal_flag_file_prefix = $(builddir)/Last_make_goal_was_
+goal_flag_file = $(goal_flag_file_prefix)$(MAKECMDGOALS)
+
 ###############################################################################
 # TARGETS
 ###############################################################################
@@ -209,7 +215,10 @@ $(builddir)/%.o:	src/%.c
 # The goal_flag_file is determined at run time because it must be the current
 # goal and not the goal in use when the dependencies makefile was created.
 $(builddir)/%.$(deps_suffix):	src/%.cc
-	$(CXX) -MM $(CPPOPTS) $(CPPFLAGS) $<
+	$(SHELL) -ec '$(CXX) -MM $(CPPOPTS) $(CPPFLAGS) $< |\
+	sed '\''s@\($*\)\.o[ :]*@$(builddir)/\1.o $@: @g'\'' > $@;\
+	[ -s $@ ] || rm -f $@'
+
 
 # If dependencies have to be up to date then include dependencies makefiles.
 ifeq "$(CHECK_DEPS)" "yes"
@@ -217,6 +226,7 @@ ifeq "$(CHECK_DEPS)" "yes"
   include $(deps)
  endif
 endif
+
 
 ###############################################################################
 # NON-BUILD TARGETS
@@ -230,4 +240,4 @@ list:
 # Remove all files that are normally created by building the program.
 .PHONY:	clean
 clean:
-	rm -f $(exe) $(objs) $(deps) data/* *.log
+	rm -f $(exe) $(goal_flag_file_prefix)* $(objs) $(deps) data/* *.log

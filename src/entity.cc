@@ -18,7 +18,9 @@ void LevelExitEntity::init() {
 
 void LevelExitEntity::tick(float dt) {
 	auto p = &puzzle->player.particle;
-	if((p->coordinate.position - coordinate.position).norm() <= p->radius) {
+	float d = (p->coordinate.position - coordinate.position).norm();
+	if(d <= p->radius) {
+		cout << "LEVEL OVER, d = " << d << endl;
 		puzzle->level_complete = true;
 	}
 }
