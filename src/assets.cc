@@ -17,6 +17,7 @@
 #include "puzzle.h"
 #include "assets.h"
 #include "entity.h"
+#include "noise.h"
 
 using namespace std;
 using namespace Eigen;

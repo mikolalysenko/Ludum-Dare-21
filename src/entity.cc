@@ -286,6 +286,7 @@ MonsterEntity::~MonsterEntity() {}
 void MonsterEntity::init() {
 	particle = initial_particle;
 	state = initial_state;
+	current_waypoint = 0;
 }
 
 void MonsterEntity::tick(float dt) {
@@ -297,21 +298,47 @@ void MonsterEntity::tick(float dt) {
 	auto center = particle.center();
 	Vector3f target_position = center;
 	
+	
+	bool has_target = false;
+	float speed_factor = 1.0;
+
 	//Chase player
-	if(flags & MONSTER_FLAG_CHASE) {
+	if(!has_target && (flags & MONSTER_FLAG_CHASE) ) {
 		auto pcenter = puzzle->player.particle.center();
 		if(vision_radius < 0 || (pcenter - center).norm() < vision_radius) {	
 			target_position = pcenter;
+			
+			//When chasing, speed up
+			speed_factor *= 2.0;
+			
+			has_target = true;
 		}
 	}
 
-	//Apply driving forces
-	Vector3f dir = target_position - center;
-	if(dir.squaredNorm() > 1e-8) {
-		dir.normalize();
-		particle.apply_force(dir * power);
+	//Advance on patrol if necessary
+	if(!has_target && (flags & MONSTER_FLAG_PATROL)) {
+		target_position = patrol_points[current_waypoint].position;
+		if((target_position - center).norm() < 2. * particle.radius) {
+			current_waypoint = (current_waypoint + 1) % patrol_points.size();
+			target_position = patrol_points[current_waypoint].position;
+		}
+		
+		has_target = true;
 	}
 	
+	//Apply driving forces
+	if(has_target) {
+	
+		Vector3f dir = target_position - center;
+		if(dir.squaredNorm() > 1e-8) {
+			dir = particle.coordinate.project_to_tangent_space(dir.normalized());
+		
+			auto force = dir * power * speed_factor;
+		
+			particle.apply_force(dir * power * speed_factor);
+		}
+	}
+		
 	//Update position
 	particle.integrate(dt);
 }

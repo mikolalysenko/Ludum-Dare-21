@@ -4,9 +4,9 @@ struct Level2Solid {
 		
 		Cell result;
 		result.density = 
-			(sin(v[0] * 0.5) +
-			sin(v[1] * 0.5) +
-			sin(v[2] * 0.5));
+			(cos(v[0] * 2.*M_PI / 15.) +
+			 cos(v[1] * 2.*M_PI / 15.) +
+			 cos(v[2] * 2.*M_PI / 15.));
 		
 		result.friction = 1./4.;
 		
@@ -20,7 +20,13 @@ struct Level2Attr {
 		
 		Vertex result;
 		result.position = v;
-		result.color = Vector3f(drand48(), drand48(), drand48());
+		
+		Array3f p = (v.array()/60.f + 0.5f) * 10.f;		
+		float noise1 = simplexNoise3D(p[0], p[1], p[2], 3);
+		p *= 4.0f;
+		float noise2 = simplexNoise3D(p[0], p[1], p[2], 5);
+		
+		result.color = Vector3f(0.2, 1, 0.5) * noise1 + Vector3f(0.8, 0.8, 0.8) * noise2;
 		
 		return result;
 	}
@@ -46,10 +52,19 @@ struct Level2 : public PuzzleGenerator {
 		
 		//Create start/end location
 		auto start_pt = level->random_point();
-		puzzle->add_entity(new LevelStartEntity(start_pt));
+		puzzle->add_entity(new LevelStartEntity(start_pt, 50));
 		
-		auto end_pt = level->random_point();
+		auto end_pt = level->closest_point(Vector3f(0, 0, 0));
 		puzzle->add_entity(new LevelExitEntity(end_pt));
+		
+		
+		//Add patroling goons
+		puzzle->add_entity(patrol_spike_monster({
+			level->closest_point(Vector3f(-29, -29, -31)),
+			level->closest_point(Vector3f( 29, -29, -31)),
+			level->closest_point(Vector3f( 29,  29, -31)),
+			level->closest_point(Vector3f(-29,  29, -31)),
+		}));
 	}
 };
 

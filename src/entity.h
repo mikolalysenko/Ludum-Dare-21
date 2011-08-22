@@ -130,6 +130,7 @@ enum MonsterFlags {
 	MONSTER_FLAG_CHASE	 	= 2,
 	MONSTER_FLAG_IMMORTAL	= 4,
 	MONSTER_FLAG_DEADLY		= 8,
+	MONSTER_FLAG_PATROL		= 16,
 };
 
 enum MonsterStateFlags {
@@ -140,12 +141,13 @@ struct MonsterEntity : public Entity {
 
 	Solid* model;
 	Particle particle;
-	int state;
+	int state, current_waypoint;
 	
 	//!!!INITIAL STATE STUFF!!!!  Do not modify after construction
-	int flags, initial_state;	
+	int flags, initial_state;
 	float vision_radius, power, draw_scale;
 	Particle initial_particle;
+	std::vector<IntrinsicCoordinate> patrol_points;
 	
 	MonsterEntity(
 		Solid* m,

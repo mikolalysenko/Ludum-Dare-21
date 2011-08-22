@@ -123,31 +123,17 @@ struct Particle {
 			return false;
 		}
 		
-		cout << "COLLISION" << endl
-			 << "r = " << (radius + other.radius) << endl
-			 << "d = " << d << endl
-			 << "p = " << p << endl
-			 << "q = " << q << endl;
-		
 		if(d < 1e-6) {
 			d = 1;
 		}
 		dir /= d;
 	
-		
-		cout << "vel = " << velocity << endl
-			 << "other.vel = " << other.velocity << endl;
-	
 		float ua = dir.dot(velocity), 
 			  ub = dir.dot(other.velocity);
-	
-		cout << "ua/ub = " << ua << ',' << ub << endl;
 	
 		if(ua + ub < 0) {
 			return true;
 		}
-	
-		cout << "Heading towards one another" << endl;
 	
 		apply_force(dir * (other.mass * (ub - ua) + other.mass * ub) / dt);
 		other.apply_force(dir * (mass * (ua - ub) + mass * ua) / dt);
