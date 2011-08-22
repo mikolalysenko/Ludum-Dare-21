@@ -12,10 +12,15 @@
 
 #define MAX_STREAMS 32
 
+#define SOUND_GROUP_CYMBAL 0
+#define SOUND_GROUP_LAST 1
+
 int initialize_sound_driver();
 bool set_sound_format(int freq, bool stereo);
 int load_sound(const char* path);
-int play_sound(int i);
+int load_sound_in_group(const char* path, int group);
+int play_sound_from_group(int group, bool looping = false, float rate = 1);
+int play_sound(int i, bool looping = false, float rate = 1);
 
 class Sound;
 class AudioStream;
@@ -49,7 +54,9 @@ class AudioStream
 		AudioStream();
 		Sound* sound;
 		bool playing;
-		Uint32 pos;
+		float pos;
+		float rate;
+		bool looping;
 		int index;
 		Uint8* data();
 		Uint32 len();
@@ -63,7 +70,7 @@ class AudioDriver
 		bool set_format(int freq, bool stereo);
 		void mix_audio(Uint8 *stream, int len);
 		int load_sound_from_file(const char* path);
-		int play_sound_object(int i);
+		int play_sound_object(int i, bool looping = false, float rate = 1);
 		void stop_stream(int i);
 	
 	private:
