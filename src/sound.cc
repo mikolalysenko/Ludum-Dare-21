@@ -335,7 +335,7 @@ int AudioDriver::get_stream_from_index(int stream)
 {
 	for(int x = 0; x < MAX_STREAMS; x++)
 	{
-		if(streams[x].index == stream)
+		if(streams[x]->index == stream)
 			return x;
 	}
 	return -1;
