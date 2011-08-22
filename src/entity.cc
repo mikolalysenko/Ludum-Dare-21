@@ -1,3 +1,4 @@
+#include <cmath>
 #include <cassert>
 #include <cstdlib>
 #include <vector>
@@ -8,6 +9,7 @@
 #include "solid.h"
 #include "entity.h"
 #include "sound.h"
+#include "text.h"
 
 using namespace std;
 using namespace Eigen;
@@ -43,12 +45,24 @@ void LevelExitEntity::tick(float dt) {
 }
 
 void LevelExitEntity::draw() {
-	auto p = coordinate.position;
-	glPointSize(10);
-	glBegin(GL_POINTS);
+
+	float theta = puzzle->elapsed_time * 180;
+	float h = puzzle->elapsed_time * M_PI / 4.0;
+
+	auto n = coordinate.interpolated_normal();
+	auto p = coordinate.position + n * (1. + sin(h));
+	auto r = n.cross(Vector3f(0, 0, 1));
+	
+	float v = -asin(r.norm());
+	r.normalize();
+
+	glPushMatrix();
+	glTranslatef(p[0], p[1], p[2]);
+	glRotatef(theta, n[0], n[1], n[2]);
+	glRotatef(v*180./M_PI, r[0], r[1], r[2]);
 	glColor3f(1, 1, 1);
-	glVertex3f(p[0], p[1], p[2]);
-	glEnd();
+	show_text("ESCAPE", -0.5*text_width("ESCAPE"), -0.02);
+	glPopMatrix();
 }
 
 //Teleporter--------------------------------------

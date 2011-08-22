@@ -41,9 +41,7 @@ struct Level0 : public PuzzleGenerator {
 		
 		//Create start/end location
 		auto start_pt = level->closest_point(Vector3f(10, 0, 0));
-		puzzle->add_entity(new LevelStartEntity(start_pt,
-			1.0f,
-			10.0f));
+		puzzle->add_entity(new LevelStartEntity(start_pt));
 		
 		auto end_pt = level->closest_point(Vector3f(-10, 0, 0));		
 		puzzle->add_entity(new LevelExitEntity(end_pt));

@@ -99,5 +99,29 @@ struct ObstacleEntity : public Entity {
 	void process_collision(Particle* particle, float dt);
 };
 
+//Lasers!
+struct LaserEntity : public Entity {
+
+	std::vector<Eigen::Vector3f> beam;
+	float beam_length, beam_step;
+	Eigen::Vector3f beam_direction;
+
+	
+	LaserEntity(
+		IntrinsicCoordinate const& coord,
+		float length,
+		float step,
+		Eigen::Vector3f direction) :
+		Entity(coord),
+		beam_length(length),
+		beam_step(step),
+		beam_direction(direction) {}
+	
+	virtual ~LaserEntity();
+	virtual void init();
+	virtual void tick(float dt);
+	virtual void draw();
+};
+
 #endif
 
