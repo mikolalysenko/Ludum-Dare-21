@@ -12,6 +12,21 @@
 using namespace std;
 using namespace Eigen;
 
+//Level start-------------------------------------------
+LevelStartEntity::~LevelStartEntity() {}
+
+void LevelStartEntity::init() {
+	auto player = &puzzle->player;
+	player->particle.coordinate = coordinate;
+	player->camera_height = camera_height;
+	player->camera_distance = camera_distance;
+	player->camera_stiffness = camera_stiffness;
+	
+	player->camera_position = coordinate.position + coordinate.interpolated_normal();
+}
+
+void LevelStartEntity::tick(float dt) {}
+void LevelStartEntity::draw() {}
 
 //Level exit--------------------------------------
 LevelExitEntity::~LevelExitEntity() {}
@@ -56,6 +71,9 @@ void TeleporterEntity::tick(float dt) {
 		//Update camera position
 		auto n = p->coordinate.interpolated_normal();
 		puzzle->player.camera_position = p->coordinate.position + n * puzzle->player.camera_height;
+		
+		//Turn off button press
+		puzzle->player.button_pressed = false;
 		
 		//Special effects
 		puzzle->player.shake_camera(1.0, 0.25);

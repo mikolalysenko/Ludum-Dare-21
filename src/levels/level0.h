@@ -39,11 +39,11 @@ struct Level0 : public PuzzleGenerator {
 		
 		puzzle->add_solid(level);
 		
-		//Create start location
+		//Create start/end location
 		auto start_pt = level->closest_point(Vector3f(10, 0, 0));
-		auto end_pt = level->closest_point(Vector3f(-10, 0, 0));
+		puzzle->add_entity(new LevelStartEntity(start_pt));
 		
-		puzzle->player.particle.coordinate = start_pt;
+		auto end_pt = level->closest_point(Vector3f(-10, 0, 0));		
 		puzzle->add_entity(new LevelExitEntity(end_pt));
 		
 		//Add some teleporters
@@ -53,7 +53,6 @@ struct Level0 : public PuzzleGenerator {
 				level->closest_point(Vector3f(0, cos(i), sin(i))*10.),
 				start_pt));
 		}
-		puzzle->player.camera_height = 30;
 		
 		//Add a button
 		auto button = new ButtonEntity(
@@ -67,10 +66,6 @@ struct Level0 : public PuzzleGenerator {
 			Affine3f(Translation3f(0, -8, 0) * Scaling(5.f)),
 			button);
 		puzzle->add_entity(obstacle);
-	}
-	
-	virtual void post_init(Puzzle* puzzle) {
-		//Nothing here for now
 	}
 };
 

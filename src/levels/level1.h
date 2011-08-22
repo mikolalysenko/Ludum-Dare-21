@@ -45,17 +45,8 @@ struct Level1 : public PuzzleGenerator {
 		puzzle->add_solid(level);
 		
 		//Create start location
-		auto tri = level->mesh.triangle(0);
-		puzzle->player.particle.coordinate =
-			IntrinsicCoordinate(
-				0,
-				level->mesh.vertex(tri.v[0]).position,
-				level);
-	}
-	
-	virtual void post_init(Puzzle* puzzle) {
-	
-		//Nothing here for now
+		//I changed this to work with new entity code - Mik
+		puzzle->add_entity(new LevelStartEntity(level->random_point()));
 	}
 };
 

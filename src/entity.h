@@ -4,6 +4,25 @@
 #include "particle.h"
 #include "puzzle.h"
 
+//The level start coordinate entity, initializes player
+struct LevelStartEntity : public Entity {
+	float camera_stiffness, camera_distance, camera_height;
+
+	LevelStartEntity(
+		IntrinsicCoordinate const& coord,
+		float height = 25.0,
+		float distance = 1.0,
+		float stiffness = 2.0) :
+		Entity(coord),
+		camera_height(height),
+		camera_distance(distance),
+		camera_stiffness(stiffness) {}
+	virtual ~LevelStartEntity();
+	virtual void init();
+	virtual void tick(float dt);
+	virtual void draw();
+};
+
 //Level exit entity object
 struct LevelExitEntity : public Entity {
 	LevelExitEntity(IntrinsicCoordinate const& coord) :

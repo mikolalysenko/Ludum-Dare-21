@@ -31,7 +31,6 @@ struct PuzzleGenerator {
 
 	virtual ~PuzzleGenerator() {}
 	virtual void setup(Puzzle* puzzle) = 0;
-	virtual void post_init(Puzzle* puzzle) = 0;
 	
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };
