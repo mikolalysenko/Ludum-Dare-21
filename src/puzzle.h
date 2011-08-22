@@ -42,6 +42,7 @@ struct Puzzle {
 	std::vector<Entity*> entities;
 	Player player;
 	bool level_complete;
+	float level_time;
 
 	Puzzle() : player(this) {}
 	~Puzzle() { clear(); }

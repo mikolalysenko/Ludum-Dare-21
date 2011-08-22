@@ -53,8 +53,20 @@ struct Level0 : public PuzzleGenerator {
 				level->closest_point(Vector3f(0, cos(i), sin(i))*10.),
 				start_pt));
 		}
-		
 		puzzle->player.camera_height = 30;
+		
+		//Add a button
+		auto button = new ButtonEntity(
+			level->closest_point(Vector3f(10, 10, 10)),
+			true);
+		puzzle->add_entity(button);
+		
+		//Add a removable obstacle
+		auto obstacle = new ObstacleEntity(
+			get_artwork("player_model"),
+			Affine3f(Translation3f(0, -8, 0) * Scaling(5.f)),
+			button);
+		puzzle->add_entity(obstacle);
 	}
 	
 	virtual void post_init(Puzzle* puzzle) {

@@ -12,6 +12,8 @@
 using namespace std;
 using namespace Eigen;
 
+
+//Level exit--------------------------------------
 LevelExitEntity::~LevelExitEntity() {}
 
 void LevelExitEntity::init() {
@@ -34,6 +36,7 @@ void LevelExitEntity::draw() {
 	glEnd();
 }
 
+//Teleporter--------------------------------------
 TeleporterEntity::~TeleporterEntity() {}
 
 void TeleporterEntity::init() {
@@ -70,4 +73,85 @@ void TeleporterEntity::draw() {
 }
 
 
+//Button--------------------------------------
+ButtonEntity::~ButtonEntity() {}
+
+void ButtonEntity::init() {
+	pressed = false;
+	last_state = false;
+}
+
+void ButtonEntity::tick(float dt) {
+
+	//Check for player press
+	auto p = &puzzle->player.particle;
+	float d = (p->coordinate.position - coordinate.position).norm();
+	if(p->coordinate.solid == coordinate.solid && d <= p->radius) {
+		if(toggleable) {
+			if(!last_state) {
+				pressed = (pressed ? false : true);
+			}
+		} else {
+			pressed = true;
+		}
+		last_state = true;	
+	}
+	else {
+		last_state = false;		
+		if(!toggleable) {
+			pressed = false;
+		}
+	}
+}
+
+void ButtonEntity::draw() {
+	auto p = coordinate.position;
+	glPointSize(10);
+	glBegin(GL_POINTS);
+	if(pressed) {
+		glColor3f(0, 1, 0);
+	} else {
+		glColor3f(1, 0, 0);
+	}
+	glVertex3f(p[0], p[1], p[2]);
+	glEnd();
+}
+
+//Obstacle-----------------------------------------
+ObstacleEntity::~ObstacleEntity() {}
+
+void ObstacleEntity::init() {
+}
+
+void ObstacleEntity::tick(float dt) {
+	if(!active()) {
+		return;
+	}
+	process_collision(&puzzle->player.particle, dt);
+}
+
+void ObstacleEntity::draw() {
+	if(!active()) {
+		return;
+	}
+	
+	glPushMatrix();
+	glMultMatrixf(transform.data());
+	model->draw();
+	glPopMatrix();
+}
+
+void ObstacleEntity::process_collision(Particle* part, float dt) {
+	
+	auto tinv = transform.inverse();
+	auto npos = tinv * part->coordinate.position;
+	auto grad = (transform.linear() * model->gradient(npos)).normalized();
+	auto spos = tinv * (part->coordinate.position + grad * part->radius);
+	
+	if((*model)(spos) > 0) {
+		part->apply_force(-grad * part->velocity.dot(grad) * 2. / dt);
+		
+		//FIXME: Add a collision sound here maybe
+	}
+}
 

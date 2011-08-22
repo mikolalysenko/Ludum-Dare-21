@@ -32,6 +32,9 @@ void Puzzle::init() {
 	for(int i=0; i<entities.size(); ++i) {
 		entities[i]->init();
 	}
+	
+	//Reset level time
+	level_time = 0;
 }
 
 //Handle input event
@@ -41,6 +44,7 @@ void Puzzle::input() {
 
 //Ticks the puzzle
 void Puzzle::tick(float dt) {
+	level_time += dt;
 	for(int i=0; i<entities.size(); ++i) {
 		entities[i]->tick(dt);
 	}
