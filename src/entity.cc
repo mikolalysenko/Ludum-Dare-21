@@ -39,7 +39,7 @@ void LevelExitEntity::init() {
 void LevelExitEntity::tick(float dt) {
 	auto p = &puzzle->player.particle;
 	float d = (p->coordinate.position - coordinate.position).norm();
-	if(p->coordinate.solid == coordinate.solid && d <= p->radius) {
+	if(p->coordinate.solid == coordinate.solid && d <= p->radius+1.0) {
 		puzzle->level_complete = true;
 	}
 }

@@ -47,16 +47,17 @@ struct Level0 : public PuzzleGenerator {
 		puzzle->add_entity(new LevelExitEntity(end_pt));
 		
 		//Add some teleporters
-		for(int i=0; i<20; ++i) {
-			float theta = (float)i * M_PI / 10.;
+		for(int i=2; i<48; ++i) {
+			float theta = (float)i * M_PI / 25.;
+			
 			puzzle->add_entity(new TeleporterEntity(
-				level->closest_point(Vector3f(0, cos(i), sin(i))*10.),
+				level->closest_point(Vector3f(0, -cos(theta), sin(theta))*10.),
 				start_pt));
 		}
 		
 		//Add a button
 		auto button = new ButtonEntity(
-			level->closest_point(Vector3f(10, 10, 10)),
+			level->closest_point(Vector3f(10, 10, 0)),
 			true);
 		puzzle->add_entity(button);
 		
