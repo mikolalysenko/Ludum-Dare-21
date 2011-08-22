@@ -71,7 +71,6 @@ void Puzzle::tick(float dt) {
 				continue;
 	
 			if(p->process_collision(B->particle, dt)) {
-				cout << "PARTICLE COLLISION" << endl;
 				//TODO: Play a sound here
 			}
 		}

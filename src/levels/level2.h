@@ -51,12 +51,11 @@ struct Level2 : public PuzzleGenerator {
 		puzzle->add_solid(level);
 		
 		//Create start/end location
-		auto start_pt = level->random_point();
+		auto start_pt = level->closest_point(Vector3f(-31, 10, 0));
 		puzzle->add_entity(new LevelStartEntity(start_pt, 50));
 		
 		auto end_pt = level->closest_point(Vector3f(0, 0, 0));
 		puzzle->add_entity(new LevelExitEntity(end_pt));
-		
 		
 		//Add patroling goons
 		puzzle->add_entity(patrol_spike_monster({
@@ -65,6 +64,36 @@ struct Level2 : public PuzzleGenerator {
 			level->closest_point(Vector3f( 29,  29, -31)),
 			level->closest_point(Vector3f(-29,  29, -31)),
 		}));
+		
+		puzzle->add_entity(patrol_spike_monster({
+			level->closest_point(Vector3f(-29, -29, 31)),
+			level->closest_point(Vector3f( 29, -29, 31)),
+			level->closest_point(Vector3f( 29,  29, 31)),
+			level->closest_point(Vector3f(-29,  29, 31)),
+		}));
+
+		puzzle->add_entity(patrol_spike_monster({
+			level->closest_point(Vector3f(-29, 31, -29)),
+			level->closest_point(Vector3f( 29, 31, -29)),
+			level->closest_point(Vector3f( 29, 31,  29)),
+			level->closest_point(Vector3f(-29, 31,  29)),
+		}));
+
+		puzzle->add_entity(patrol_spike_monster({
+			level->closest_point(Vector3f(-29, -31, -29)),
+			level->closest_point(Vector3f( 29, -31, -29)),
+			level->closest_point(Vector3f( 29, -31,  29)),
+			level->closest_point(Vector3f(-29, -31,  29)),
+		}));
+
+
+		puzzle->add_entity(patrol_spike_monster({
+			level->closest_point(Vector3f(31, -29, -29)),
+			level->closest_point(Vector3f(31, 29, -29)),
+			level->closest_point(Vector3f(31, 29,  29)),
+			level->closest_point(Vector3f(31, -29,  29)),
+		}));
+		
 	}
 };
 
