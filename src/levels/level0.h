@@ -59,7 +59,7 @@ struct Level0 : public PuzzleGenerator {
 		auto button = new ButtonEntity(
 			level->closest_point(Vector3f(10, 10, 0)),
 			BUTTON_TIMED,
-			10.f);
+			20.f);
 		puzzle->add_entity(button);
 		
 		//Add a removable obstacle

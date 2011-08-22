@@ -56,6 +56,8 @@ void LevelExitEntity::draw() {
 	float v = -asin(r.norm());
 	r.normalize();
 
+	glDisable(GL_LIGHTING);
+
 	glPushMatrix();
 	glTranslatef(p[0], p[1], p[2]);
 	glRotatef(theta, n[0], n[1], n[2]);
@@ -63,6 +65,8 @@ void LevelExitEntity::draw() {
 	glColor3f(1, 1, 1);
 	show_text("ESCAPE", -0.5*text_width("ESCAPE"), -0.02);
 	glPopMatrix();
+	
+	glEnable(GL_LIGHTING);
 }
 
 //Teleporter--------------------------------------
@@ -96,12 +100,17 @@ void TeleporterEntity::tick(float dt) {
 }
 
 void TeleporterEntity::draw() {
+	glDisable(GL_LIGHTING);
+
 	auto p = coordinate.position;
 	glPointSize(10);
 	glBegin(GL_POINTS);
 	glColor3f(drand48(), drand48(), drand48());
 	glVertex3f(p[0], p[1], p[2]);
 	glEnd();
+	
+	
+	glEnable(GL_LIGHTING);
 }
 
 
@@ -165,6 +174,8 @@ void ButtonEntity::tick(float dt) {
 }
 
 void ButtonEntity::draw() {
+	glDisable(GL_LIGHTING);
+
 	auto p = coordinate.position;
 	glPointSize(10);
 	glBegin(GL_POINTS);
@@ -175,6 +186,8 @@ void ButtonEntity::draw() {
 	}
 	glVertex3f(p[0], p[1], p[2]);
 	glEnd();
+
+	glEnable(GL_LIGHTING);
 }
 
 //Obstacle-----------------------------------------

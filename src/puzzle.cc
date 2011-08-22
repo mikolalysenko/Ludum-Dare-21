@@ -79,7 +79,9 @@ void Puzzle::draw() {
 	if(d.norm() > 1e-6) {
 		d.normalize();
 	}
-	Vector3f lp = player.camera_position + player.camera_up * 2.f + d * 5.f;
+	Vector3f u = (player.camera_up - d * d.dot(player.camera_up)).normalized();
+	
+	Vector3f lp = player.camera_position + (d + u) * (3*player.camera_height);
 	GLfloat light_pos[4];
 	light_pos[0] = lp[0];
 	light_pos[1] = lp[1];
