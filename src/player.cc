@@ -10,6 +10,7 @@
 #include "player.h"
 #include "puzzle.h"
 #include "assets.h"
+#include "entity.h"
 
 using namespace std;
 using namespace Eigen;
@@ -86,6 +87,36 @@ void Player::input() {
 	button_pressed = nstate;
 }
 
+void clip_camera(
+	Vector3f const& local_position,
+	Vector3f& camera_position,
+	Solid* s,
+	Affine3f const& transform) {
+
+	auto tinv = transform.inverse();
+	auto p = tinv * local_position;
+	auto q = tinv * camera_position;
+	
+	if( (*s)(q) > -1e6 )
+		return;
+	
+	float lo=0, hi=1.0, m;
+	while(abs(lo - hi) > 1e-6) {
+		m = 0.5 * (lo + hi);
+		
+		auto x = q*(1.-m) + p*m;
+		if( (*s)(x) > -1e6 ) {
+			hi = m;
+		}
+		else {
+			lo = m;
+		}
+	}
+	
+	camera_position = camera_position*(1.-m) + local_position*m;
+}
+
+
 void Player::tick(float dt) {
 	//Apply player input force
 	if(button_pressed) {
@@ -121,7 +152,7 @@ void Player::tick(float dt) {
 			target_position = p - vel.normalized() * camera_distance + n * camera_height;
 		}
 		else {
-			target_position = p + n * camera_height;
+			target_position = p + n * camera_height + particle.coordinate.project_to_tangent_space(camera_position - p).normalized() * camera_distance;
 		}
 	}
 
@@ -130,28 +161,17 @@ void Player::tick(float dt) {
 	camera_position = tau * camera_position + (1.f - tau) * target_position;
 	camera_up = (tau * camera_up + (1.f - tau) * n).normalized();
 	
-	//Keep camera from colliding
+	//Keep camera from colliding with solids
 	for(int i=0; i<puzzle->solids.size(); ++i) {
-		auto s = puzzle->solids[i];
-		
-		if( (*s)(camera_position) > -1e6 )
-			continue;
-		
-		float lo=0, hi=1.0, m;
-		while(abs(lo - hi) > 1e-6) {
-			m = 0.5 * (lo + hi);
-			
-			auto x = camera_position*(1.-m) + p*m;
-			
-			if( (*s)(x) > -1e6 ) {
-				hi = m;
-			}
-			else {
-				lo = m;
-			}
+		clip_camera(p, camera_position, puzzle->solids[i], Affine3f::Identity());
+	}
+	
+	//Keep camera from colliding with obstacles
+	for(int i=0; i<puzzle->entities.size(); ++i) {
+		auto entity = dynamic_cast<ObstacleEntity*>(puzzle->entities[i]);
+		if(entity != NULL) {
+			clip_camera(p, camera_position, entity->model, entity->transform);
 		}
-		
-		camera_position = camera_position*(1.-m) + p*m;
 	}
 	
 	//Update camera shake
@@ -189,7 +209,7 @@ void Player::draw() {
 	auto n = particle.coordinate.interpolated_normal();
 
 	glPushMatrix();
-	auto c = p + n * particle.radius;
+	auto c = p + n * (particle.radius + 0.1);
 	auto rot = AngleAxisf(particle.rotation);
 	glTranslatef(c[0], c[1], c[2]);
 	glRotatef(rot.angle() * (180./M_PI), rot.axis()[0], rot.axis()[1], rot.axis()[2]);
