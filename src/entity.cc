@@ -42,9 +42,12 @@ void TeleporterEntity::tick(float dt) {
 	auto p = &puzzle->player.particle;
 	float d = (p->coordinate.position - coordinate.position).norm();
 	if(p->coordinate.solid == coordinate.solid && d <= p->radius) {
-		cout << "Teleport!" << endl;
 		p->coordinate = target_coordinate;
-		puzzle->player.shake_camera(0.1, 2.0);
+		puzzle->player.shake_camera(1.0, 0.25);
+		
+		puzzle->player.button_pressed = false;		
+		auto v_dir = target_coordinate.project_to_tangent_space(p->velocity).normalized();
+		p->velocity = p->velocity.norm() * v_dir;
 	}
 }
 

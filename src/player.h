@@ -47,8 +47,8 @@ struct Player {
 	
 	//Functions
 	void shake_camera(float mag, float t) {
-		camera_shake_mag += mag;
-		camera_shake_time = 1.0 / (t + 1.0/camera_shake_time);
+		camera_shake_mag  = mag;
+		camera_shake_time = 1.0 / t;
 	}
 
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
