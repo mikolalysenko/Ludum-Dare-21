@@ -1,6 +1,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include "puzzle.h"
+#include "entity.h"
 
 using namespace std;
 using namespace Eigen;
@@ -52,6 +53,30 @@ void Puzzle::input() {
 //Ticks the puzzle
 void Puzzle::tick(float dt) {
 	elapsed_time += dt;
+	
+	//!HACK!  Need to apply collision forces before integrating, do one pass over entities to update monsters first - Mik
+	for(int i=entities.size()-1; i>=0; --i) {
+		auto A = dynamic_cast<MonsterEntity*>(entities[i]);
+		if(A == NULL || !(A->flags & MONSTER_FLAG_COLLIDES))
+			continue;
+		
+		auto p = &A->particle;	
+		if(p->process_collision(player.particle, dt) && (A->flags & MONSTER_FLAG_DEADLY)) {
+			kill_player();
+		}
+		
+		for(int j=i-1; j>=0; --j) {
+			auto B = dynamic_cast<MonsterEntity*>(entities[j]);
+			if(B == NULL || !(B->flags & MONSTER_FLAG_COLLIDES))
+				continue;
+	
+			if(p->process_collision(B->particle, dt)) {
+				cout << "PARTICLE COLLISION" << endl;
+				//TODO: Play a sound here
+			}
+		}
+	}	
+	
 	for(int i=0; i<entities.size(); ++i) {
 		entities[i]->tick(dt);
 	}

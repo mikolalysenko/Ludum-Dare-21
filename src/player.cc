@@ -43,7 +43,6 @@ void Player::reset() {
 	particle.coordinate = IntrinsicCoordinate(-1, Vector3f(0,0,0), NULL);
 	particle.velocity = Vector3f(1, 0, 0);
 	particle.forces = Vector3f(0, 0, 0);
-	particle.color = Vector3f(1, 1, 1);
 	particle.rotation = Quaternionf(1, 0, 0, 0);
 	particle.radius = 0.5f;
 	particle.mass = 1.0f;
@@ -57,6 +56,8 @@ void Player::reset() {
 	camera_up = Vector3f(0, 0, 0);
 	mouse_state[0] = mouse_state[1] = Vector2f(0,0);
 	button_pressed = false;
+	
+	strength = 5.f;
 }
 
 
@@ -128,8 +129,12 @@ void Player::tick(float dt) {
 		Vector2f dmouse(
 			2.f * (mouse_state[1][0] - (float)viewport[0]) / (float)viewport[2] - 1.f,
 			2.f * (mouse_state[1][1] - (float)viewport[1]) / (float)viewport[3] - 1.f);
+			
+		if(dmouse.squaredNorm() > 1.f) {
+			dmouse.normalize();
+		}
 		
-		Vector3f force = dmouse[0] * force_right - dmouse[1] * force_up;
+		Vector3f force = strength * (dmouse[0] * force_right - dmouse[1] * force_up);
 		
 		particle.apply_force(force);
 	}

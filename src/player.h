@@ -28,6 +28,9 @@ struct Player {
 	//Physical parameters
 	Particle particle;
 	
+	//State parameters
+	float strength;
+	
 	//Puzzle data
 	const struct Puzzle* puzzle;
 

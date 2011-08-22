@@ -124,22 +124,52 @@ struct ObstacleEntity : public Entity {
 	bool process_collision(Particle* particle, float dt);
 };
 
-//Spike monster!
-struct SpikeballEntity : public Entity {
+//Monsters!
+enum MonsterFlags {
+	MONSTER_FLAG_COLLIDES	= 1,
+	MONSTER_FLAG_CHASE	 	= 2,
+	MONSTER_FLAG_IMMORTAL	= 4,
+	MONSTER_FLAG_DEADLY		= 8,
+};
+
+enum MonsterStateFlags {
+	MONSTER_STATE_DEAD	= 1,
+};
+
+struct MonsterEntity : public Entity {
 
 	Solid* model;
-	Particle physics;
-	float vision_radius, speed;
+	Particle particle;
+	int state;
 	
-	SpikeballEntity(
-		IntrinsicCoordinate const& position,
-		float speed = 1.0,
-		float vision = 20.0);
-		
-	virtual ~SpikeballEntity();
+	//!!!INITIAL STATE STUFF!!!!  Do not modify after construction
+	int flags, initial_state;	
+	float vision_radius, power, draw_scale;
+	Particle initial_particle;
+	
+	MonsterEntity(
+		Solid* m,
+		Particle const& p,
+		int flags_ = MONSTER_FLAG_COLLIDES,
+		int state_ = 0,
+		float power_ = 1.0,
+		float vision = -1.0,
+		float draw_scale_ = 1.0) :
+		model(m),
+		initial_particle(p),
+		flags(flags_),
+		initial_state(state_),
+		power(power_),
+		vision_radius(vision),
+		draw_scale(draw_scale_) {}
+	
+	virtual ~MonsterEntity();
 	virtual void init();
 	virtual void tick(float dt);
 	virtual void draw();
+	
+	//Kills the monster
+	void kill();
 };
 
 //Lasers!

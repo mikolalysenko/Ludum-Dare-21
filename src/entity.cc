@@ -51,17 +51,22 @@ void LevelExitEntity::draw() {
 
 	auto n = coordinate.interpolated_normal();
 	auto p = coordinate.position + n * (1. + sin(h));
-	auto r = n.cross(Vector3f(0, 0, 1));
-	
-	float v = -asin(r.norm());
-	r.normalize();
 
 	glDisable(GL_LIGHTING);
 
 	glPushMatrix();
 	glTranslatef(p[0], p[1], p[2]);
 	glRotatef(theta, n[0], n[1], n[2]);
-	glRotatef(v*180./M_PI, r[0], r[1], r[2]);
+
+	
+	auto r = n.cross(Vector3f(0, 0, 1));	
+	float m = r.norm();
+	if(m) {
+		float v = -asin(m);
+		r /= m;
+		glRotatef(v*180./M_PI, r[0], r[1], r[2]);
+	}
+	
 	glColor3f(1, 1, 1);
 	show_text("ESCAPE", -0.5*text_width("ESCAPE"), -0.02);
 	glPopMatrix();
@@ -128,7 +133,21 @@ void ButtonEntity::tick(float dt) {
 	//Check for player press
 	auto p = &puzzle->player.particle;
 	float d = (p->coordinate.position - coordinate.position).norm();
-	if(p->coordinate.solid == coordinate.solid && d <= p->radius) {
+	
+	bool just_pressed = (p->coordinate.solid == coordinate.solid && d <= p->radius);
+	
+	//Check for monster press
+	for(int i=0; i<puzzle->entities.size(); ++i) {
+		auto monster = dynamic_cast<MonsterEntity*>(puzzle->entities[i]);
+		if(monster != NULL && (monster->flags & MONSTER_FLAG_COLLIDES)) {
+			auto mcoord = &monster->particle.coordinate;
+			just_pressed |=
+				mcoord->solid == coordinate.solid &&
+				((mcoord->position - coordinate.position).norm() < monster->particle.radius);
+		}
+	}
+	
+	if(just_pressed) {
 	
 		switch(type) {
 			case BUTTON_PRESS:
@@ -155,10 +174,13 @@ void ButtonEntity::tick(float dt) {
 		last_state = true;	
 	}
 	else {
-		last_state = false;		
 		if(type == BUTTON_PRESS) {
+			if(last_state) {
+				//TODO: Play a sound
+			}
 			pressed = false;
 		}
+		last_state = false;		
 	}
 	
 	if(type == BUTTON_TIMED && pressed) {
@@ -200,6 +222,16 @@ void ObstacleEntity::tick(float dt) {
 	if((flags & OBSTACLE_NO_COLLIDE) ||
 		!active()) {
 		return;
+	}
+	
+	//Collide with all monsters
+	for(int i=0; i<puzzle->entities.size(); ++i) {
+		auto monster = dynamic_cast<MonsterEntity*>(puzzle->entities[i]);
+		if(monster != NULL && (monster->flags & MONSTER_FLAG_COLLIDES)) {
+			if( process_collision(&monster->particle, dt) && (flags & OBSTACLE_DEADLY) ) {
+				monster->kill();	
+			}
+		}
 	}
 	
 	if(process_collision(&puzzle->player.particle, dt)) {
@@ -246,4 +278,66 @@ bool ObstacleEntity::process_collision(Particle* part, float dt) {
 	
 	return false;
 }
+
+//Monster!-----------------------------------------
+
+MonsterEntity::~MonsterEntity() {}
+
+void MonsterEntity::init() {
+	particle = initial_particle;
+	state = initial_state;
+}
+
+void MonsterEntity::tick(float dt) {
+	if(state & MONSTER_STATE_DEAD) {
+		return;
+	}
+	
+	//Figure out where the target is
+	auto center = particle.center();
+	Vector3f target_position = center;
+	
+	//Chase player
+	if(flags & MONSTER_FLAG_CHASE) {
+		auto pcenter = puzzle->player.particle.center();
+		if(vision_radius < 0 || (pcenter - center).norm() < vision_radius) {	
+			target_position = pcenter;
+		}
+	}
+
+	//Apply driving forces
+	Vector3f dir = target_position - center;
+	if(dir.squaredNorm() > 1e-8) {
+		dir.normalize();
+		particle.apply_force(dir * power);
+	}
+	
+	//Update position
+	particle.integrate(dt);
+}
+
+void MonsterEntity::draw() {
+	if(state & MONSTER_STATE_DEAD) {
+		return;
+	}
+	
+	glPushMatrix();
+	auto c = particle.center();
+	auto rot = AngleAxisf(particle.rotation);
+	glTranslatef(c[0], c[1], c[2]);
+	glRotatef(rot.angle() * (180./M_PI), rot.axis()[0], rot.axis()[1], rot.axis()[2]);
+	glScalef(draw_scale, draw_scale, draw_scale);
+	model->draw();
+	glPopMatrix();
+}
+
+//Kills the monster
+void MonsterEntity::kill() {
+	if(flags & MONSTER_FLAG_IMMORTAL)
+		return;
+	state = MONSTER_STATE_DEAD;
+	
+	//FIXME: Create a special effect here/play a sound
+}
+
 

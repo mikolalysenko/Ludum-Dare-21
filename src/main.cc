@@ -150,7 +150,7 @@ void init()
 	//load_sound_in_group("data/teleport3.wav", SOUND_GROUP_MENU_CHANGE);*/
 	
 	//initialize level data
-	puzzle.setup(get_level(0));
+	puzzle.setup(get_level(2));
 }
 
 bool togglekey(int GLFWKey, int menukey)

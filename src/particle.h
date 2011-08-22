@@ -1,6 +1,7 @@
 #ifndef PARTICLE_H
 #define PARTICLE_H
 
+#include <iostream>
 #include <vector>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -9,7 +10,7 @@
 
 struct Particle {
 	IntrinsicCoordinate coordinate;
-	Eigen::Vector3f velocity, forces, color;
+	Eigen::Vector3f velocity, forces;
 	Eigen::Quaternionf rotation;
 	float mass, radius;
 	
@@ -18,21 +19,18 @@ struct Particle {
 		coordinate(p.coordinate),
 		velocity(p.velocity),
 		forces(p.forces),
-		color(p.color),
 		rotation(p.rotation),
 		mass(p.mass),
 		radius(p.radius) {}
 	Particle(
 		IntrinsicCoordinate const& coord,
 		Eigen::Vector3f const& v,
-		Eigen::Vector3f const& c,
 		Eigen::Quaternionf const& rot,
 		float m,
 		float r) :
 		coordinate(coord),
 		velocity(v),
 		forces(0,0,0),
-		color(c),
 		rotation(rot),
 		mass(m),
 		radius(r) {}
@@ -40,7 +38,6 @@ struct Particle {
 		coordinate = p.coordinate;
 		velocity = p.velocity;
 		forces = p.forces;
-		color = p.color;
 		rotation = p.rotation;
 		mass = p.mass;
 		radius = p.radius;
@@ -53,6 +50,7 @@ struct Particle {
 	
 	void integrate(float delta_t) {
 		using namespace Eigen;
+		using namespace std;
 		
 		//Integrate velocity
 		velocity += forces * (delta_t / mass);
@@ -63,15 +61,19 @@ struct Particle {
 		}
 		float mag = velocity.norm();
 		
-		//Integrate rotation
 		if(mag > 1e-8) {
+			//Integrate rotation
 			Vector3f normal = coordinate.interpolated_normal();
 			AngleAxisf rot(mag*delta_t/radius, normal.cross(velocity).normalized());
 			rotation = rot * rotation;
+
+			//Integrate position
+			velocity = coordinate.advect(velocity * delta_t);
+			auto m = velocity.norm();
+			if( m > 1e-8 ) {
+				velocity *= mag / m;
+			}
 		}
-		
-		//Integrate position
-		velocity = coordinate.advect(velocity * delta_t).normalized() * mag;
 	}
 	
 	Eigen::Matrix3f frame() const {
@@ -107,11 +109,52 @@ struct Particle {
 		return coordinate.position + coordinate.interpolated_normal() * radius;
 	}
 	
-	//Checks if two particles collide
-	bool check_collide(Particle const& other) const {
-		return (other.center() - center()).norm() < other.radius + radius;
-	}
+	//Handles collision test
+	bool process_collision(Particle& other, float dt) {
+		using namespace std;
+		using namespace Eigen;
 	
+		auto p = center();
+		auto q = other.center();
+		Vector3f dir = p - q;
+		
+		float d = dir.norm();
+		if(d > radius + other.radius) {
+			return false;
+		}
+		
+		cout << "COLLISION" << endl
+			 << "r = " << (radius + other.radius) << endl
+			 << "d = " << d << endl
+			 << "p = " << p << endl
+			 << "q = " << q << endl;
+		
+		if(d < 1e-6) {
+			d = 1;
+		}
+		dir /= d;
+	
+		
+		cout << "vel = " << velocity << endl
+			 << "other.vel = " << other.velocity << endl;
+	
+		float ua = dir.dot(velocity), 
+			  ub = dir.dot(other.velocity);
+	
+		cout << "ua/ub = " << ua << ',' << ub << endl;
+	
+		if(ua + ub < 0) {
+			return true;
+		}
+	
+		cout << "Heading towards one another" << endl;
+	
+		apply_force(dir * (other.mass * (ub - ua) + other.mass * ub) / dt);
+		other.apply_force(dir * (mass * (ua - ub) + mass * ua) / dt);
+		
+		return true;
+	}
+		
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };
 

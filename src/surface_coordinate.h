@@ -150,7 +150,13 @@ struct IntrinsicCoordinate {
 		//Set up initial vectors
 		Vector3f v_dir = project_to_tangent_space(v);
 		float    v_mag = v_dir.norm();
-		v_dir /= v_mag;
+		if(v_mag > 1e-8) {
+			v_dir /= v_mag;
+		}
+		else {
+			v_dir = Vector3f(1, 0, 0);
+			v_mag = 0.f;
+		}
 		const float i_mag = v_mag;
 		
 		while(v_mag > 1e-8) {
