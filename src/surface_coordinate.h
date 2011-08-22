@@ -147,6 +147,8 @@ struct IntrinsicCoordinate {
 		}
 		
 		
+		int niter = 0;
+		
 		//Set up initial vectors
 		Vector3f v_dir = project_to_tangent_space(v);
 		float    v_mag = v_dir.norm();
@@ -160,6 +162,7 @@ struct IntrinsicCoordinate {
 		const float i_mag = v_mag;
 		
 		while(v_mag > 1e-8) {
+				
 			//Calculate tangent space
 			auto tri = solid->mesh.triangle(triangle_index);
 			auto verts = triangle_vertices();
@@ -172,10 +175,15 @@ struct IntrinsicCoordinate {
 			v_dir = (residual_velocity - n * n.dot(residual_velocity)).normalized();
 			residual_velocity = v_dir * v_mag;
 			
+			//HACK: Early out if we get stuck in a loop (can happen with sharp edges :-P)
+			if(++niter > 25) {
+				break;
+			}
+			
 			//Compute advected position in barycentric coordinates
 			Vector3f mu = barycentric(position + residual_velocity, n, du, dv, verts[0]),
 					 nu = barycentric(position, n, du, dv, verts[0]);
-			//clamp_barycentric(nu);
+			clamp_barycentric(nu);
 			
 			//Find intersection with edge of triangle
 			Vector3f db = mu - nu;
@@ -197,7 +205,7 @@ struct IntrinsicCoordinate {
 			
 			//Update position and residual velocity
 			Vector3f b = nu + db * t;
-			//clamp_barycentric(b);
+			clamp_barycentric(b);
 			auto nposition = verts[0] + b[2]*du + b[1]*dv;
 			float dposition = (nposition - position).norm();
 			v_mag = max(0.f, v_mag - dposition);
