@@ -1,5 +1,25 @@
 #include "sound.h"
 
+#include <stdlib.h>
+
+std::vector<std::vector<int>> soundgroup(SOUND_GROUP_LAST);
+
+int load_sound_in_group(const char* path, int group)
+{
+	int sound = load_sound(path);
+	soundgroup[group].push_back(sound);
+	
+	return sound;
+}
+
+int play_sound_from_group(int group, bool looping, float rate)
+{
+	int i = rand();
+	int num = i % soundgroup[group].size();
+	
+	return play_sound(soundgroup[group][num], looping, rate);
+}
+
 AudioDriver driver;
 
 void mix_audio_c(void *drv, Uint8 *stream, int len)
@@ -19,16 +39,14 @@ int load_sound(const char* path)
 	return driver.load_sound_from_file(path);
 }
 
-int play_sound(int i)
+int play_sound(int i, bool looping, float rate)
 {
-	return driver.play_sound_object(i);
+	return driver.play_sound_object(i, looping, rate);
 }
 
 int initialize_sound_driver()
 {
 	driver.initialize();
-	
-	int sf = load_sound("data/audio.wav");
 	
 	if(!driver.set_format(SOUND_FREQ_22KHZ, true))
 	{
@@ -37,8 +55,6 @@ int initialize_sound_driver()
 		
 		return 0;
 	}
-	
-	int s = play_sound(sf);
 	
 	return 1;
 }
@@ -148,22 +164,67 @@ int AudioDriver::load_sound_from_file(const char* path)
 	return sounds.size();
 }
 
+int interpolate(float val, int min, int max)
+{
+	val -= (int)val;
+	
+	if(val == 0)
+		return min;
+	
+	return (int)((min * (1 - val)) + (max * val));
+}
+
 void AudioDriver::mix_audio(Uint8 *stream, int len)
 {
     Uint32 amount;
 
+	len >>= 1;
+	
     for(int i = 0; i < MAX_STREAMS; i++)
 	{
-		if(streams[i]->playing)
+		if(!streams[i]->playing)
+			continue;
+		
+		short *curstream = (short*)stream;
+		int index = 0;
+		short *readstream = (short*)streams[i]->data();
+		int readlen = streams[i]->len() >> 1;
+		float pos = streams[i]->pos;
+		
+		while(index < len && streams[i]->playing)
 		{
-			amount = (streams[i]->len() - streams[i]->pos);
-			if(amount > len)
+			int ipos = (int)pos;
+			int left, right;
+			left = readstream[ipos];
+			if(ipos == readlen - 1)
+				right = readstream[ipos];
+			else
+				right = readstream[ipos+1];
+			
+			int nval = curstream[index];
+			nval += interpolate(pos, left, right);
+			if(nval > 0x7fff)
+				nval = 0x7fff;
+			if(nval < -(0x8000))
+				nval = 0x8000;
+			curstream[index] = nval;
+			
+			pos += streams[i]->rate;
+			
+			if(pos >= readlen)
 			{
-				amount = len;
+				if(streams[i]->looping)
+				{
+					while(pos >= readlen)
+						pos -= readlen;
+				}
+				else
+					streams[i]->playing = false;
 			}
-			SDL_MixAudio(stream, &streams[i]->data()[streams[i]->pos], amount, SDL_MIX_MAXVOLUME);
-			streams[i]->pos += amount;
+			
+			index++;
 		}
+		streams[i]->pos = pos;
     }
 }
 
@@ -197,7 +258,7 @@ int AudioDriver::get_free_stream()
 	return -1;
 }
 
-int AudioDriver::play_sound_object(int i)
+int AudioDriver::play_sound_object(int i, bool looping, float rate)
 {
 	int stream = get_free_stream();
 	
@@ -218,8 +279,10 @@ int AudioDriver::play_sound_object(int i)
 	SDL_LockAudio();
 	streams[stream]->sound = sounds[i];
 	streams[stream]->pos = 0;
+	streams[stream]->rate = rate;
 	streams[stream]->playing = true;
 	streams[stream]->index = streamindex;
+	streams[stream]->looping = looping;
 	SDL_UnlockAudio();
 	
 	streamindex++;

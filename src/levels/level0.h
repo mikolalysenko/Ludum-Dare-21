@@ -40,6 +40,7 @@ struct Level0 : public PuzzleGenerator {
 		puzzle->add_solid(level);
 		
 		//Create start location
+		
 		auto tri = level->mesh.triangle(0);
 		puzzle->add_entity(new StartEntity(
 			IntrinsicCoordinate(

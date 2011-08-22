@@ -127,6 +127,16 @@ void init()
 	//TODO: in the future, this should be "showmenu(mainmenu)". Right now, I am defaulting it to just jump right into the game to make development easier (so you don't have to go through menus to test)
 	showmenu(NULL);
 
+	//sound stuff
+	//load_sound_in_group("data/test1.wav", SOUND_GROUP_CYMBAL);
+	//load_sound_in_group("data/test2.wav", SOUND_GROUP_CYMBAL);
+	load_sound_in_group("data/test3.wav", SOUND_GROUP_CYMBAL);
+	
+	/*play_sound_from_group(SOUND_GROUP_CYMBAL, true, 0.5);
+	play_sound_from_group(SOUND_GROUP_CYMBAL, true, 1);
+	play_sound_from_group(SOUND_GROUP_CYMBAL, true, 1.5);
+	play_sound_from_group(SOUND_GROUP_CYMBAL, true);*/
+	
 	//initialize level data
 	puzzle.setup(get_level(0));
 }
@@ -233,7 +243,7 @@ void draw() {
 	//draw text as white
 	glColor3f(1, 1, 1);
 	
-	/*show_text("Normal Text!", 0, 0, 0.05, TEXT_STYLE_NORMAL);
+	show_text("Normal Text!", 0, 0, 0.05, TEXT_STYLE_NORMAL);
 	show_text("Bold Text!", 0, 0.05, 0.05, TEXT_STYLE_BOLD);
 	show_text("Italic Text!", 0, 0.1, 0.05, TEXT_STYLE_ITALIC);
 	show_text("Bold and Italic Text!", 0, 0.15, 0.05, TEXT_STYLE_BOLD_AND_ITALIC);
@@ -250,7 +260,7 @@ void draw() {
 
 	allstr[95] = '\0';
 	
-	show_text(allstr, 0, 0.8, 0.02);*/
+	show_text(allstr, 0, 0.8, 0.02);
 	
 	if(currentmenu != NULL)
 		currentmenu->render();
