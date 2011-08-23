@@ -16,7 +16,7 @@ struct Level0Attr {
 		Vertex result;
 		result.position = v;
 		result.normal = Vector3f(1, 0, 0);
-		result.color = Vector3f(0.2,0.2,0.2)*drand48();
+		result.color = Vector3f(0.2,0.2,0.8)*drand48() + Vector3f(1, 1, 0) * drand48();
 		return result;
 	}
 };
