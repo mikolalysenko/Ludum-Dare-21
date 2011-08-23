@@ -66,6 +66,7 @@ struct ButtonEntity : public Entity {
 	ButtonType type;
 	float time_limit, time_left;
 	bool pressed, last_state;
+	bool tickfreq;
 	
 	ButtonEntity(
 		IntrinsicCoordinate const& coord,
@@ -76,7 +77,8 @@ struct ButtonEntity : public Entity {
 		time_limit(time),
 		time_left(0.f),
 		pressed(false),
-		last_state(false) {}
+		last_state(false),
+		tickfreq(false) {}
 
 	virtual ~ButtonEntity();
 	virtual void init();

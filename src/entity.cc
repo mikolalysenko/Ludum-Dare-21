@@ -170,25 +170,64 @@ void ButtonEntity::tick(float dt) {
 	
 		if(!last_state) {
 			//TODO: Play a sound effect/special effect here
+			play_sound_from_group(SOUND_GROUP_BUTTON);
 		}
 		last_state = true;	
 	}
 	else {
 		if(type == BUTTON_PRESS) {
 			if(last_state) {
-				//TODO: Play a sound
+				play_sound_from_group(SOUND_GROUP_BUTTON);
 			}
 			pressed = false;
 		}
 		last_state = false;		
 	}
 	
-	if(type == BUTTON_TIMED && pressed) {
+	if(type == BUTTON_TIMED && pressed)
+	{
+		if(time_left < time_limit - .5)
+		{
+			float f = time_left;
+			float d = dt;
+			
+			if(time_left < 10)
+			{
+				f *= 2;
+				d *= 2;
+			}
+			
+			if(time_left < 3)
+			{
+				f *= 2;
+				d *= 2;
+			}
+			
+			if(time_left < 1)
+			{
+				f *= 2;
+				d *= 2;
+			}
+			
+			
+			if((int)f != (int)(f - d))
+			{
+				if(tickfreq)
+					play_sound_from_group(SOUND_GROUP_TICK_HIGH);
+				else
+					play_sound_from_group(SOUND_GROUP_TICK_LOW);
+				
+				tickfreq = !tickfreq;
+			}
+		}
+		
 		time_left -= dt;
 		
 		if(time_left < 0) {
 			time_left = 0;
 			pressed = false;
+			
+			play_sound_from_group(SOUND_GROUP_GATE_CLOSE);
 			
 			//TODO: Play a sound for the button deactivating here
 		}
@@ -261,8 +300,7 @@ bool ObstacleEntity::process_collision(Particle* part, float dt) {
 	
 	if((*model)(npos) > -1e-6) {
 		part->apply_force(-grad * 100.0);
-		
-		//FIXME Add a collision sound
+		play_sound_from_group(SOUND_GROUP_BOUNCE);
 		return true;
 	} else {	
 		auto spos = tinv * (part->coordinate.position + grad * part->radius);	
@@ -270,7 +308,7 @@ bool ObstacleEntity::process_collision(Particle* part, float dt) {
 			float d = part->velocity.dot(grad);
 			if( d > 0 ) {
 				part->apply_force(-grad * part->velocity.dot(grad) * 2. / dt);
-				//FIXME: Add a collision sound
+				play_sound_from_group(SOUND_GROUP_BOUNCE);
 			}
 			return true;
 		}
