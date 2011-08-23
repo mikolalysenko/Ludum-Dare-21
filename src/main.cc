@@ -105,9 +105,9 @@ void init()
 	optionsmenu = new Menu("Options");
 	
 	mainmenu->add_option("Level Select", &showmenu, levelmenu);
-	mainmenu->add_option("Options", &showmenu, optionsmenu);
+	//mainmenu->add_option("Options", &showmenu, optionsmenu);
 	mainmenu->add_option("Exit", &showmenu, quitmenu);
-	mainmenu->set_esc_option(2);
+	mainmenu->set_esc_option(1);
 	
 	quitmenu->add_option("No", &showmenu, mainmenu);
 	quitmenu->add_option("Yes", &exit);
@@ -115,8 +115,11 @@ void init()
 	
 	levelmenu->add_option("Level 1", &startlevel, (void*)0);
 	levelmenu->add_option("Level 2", &startlevel, (void*)1);
+	levelmenu->add_option("Level 3", &startlevel, (void*)2);
+	levelmenu->add_option("Level 4", &startlevel, (void*)3);
+	levelmenu->add_option("Level 5", &startlevel, (void*)4);
 	levelmenu->add_option("Go Back", &showmenu, mainmenu);
-	levelmenu->set_esc_option(2);
+	levelmenu->set_esc_option(6);
 	
 	optionsmenu->add_option("Go Back", &showmenu, mainmenu);
 	optionsmenu->set_esc_option(0);
