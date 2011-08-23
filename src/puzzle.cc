@@ -2,6 +2,7 @@
 #include <Eigen/Geometry>
 #include "puzzle.h"
 #include "entity.h"
+#include "sound.h"
 
 using namespace std;
 using namespace Eigen;
@@ -134,7 +135,8 @@ void Puzzle::draw() {
 void Puzzle::kill_player() {
 
 	//TODO: Add some special effects here
-	
+	play_sound_from_group(SOUND_GROUP_DEATH, false, 0.5);
+
 	//Reset the puzzle
 	init();
 }

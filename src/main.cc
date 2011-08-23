@@ -25,10 +25,11 @@ using namespace Mesh;
 
 namespace App {
 
-int start_level = 0;
+int start_level = -1;
 
 bool running = true;
-bool ingame = true;
+bool ingame = false;
+bool dead = false;
 
 double fov=45., znear=1., zfar=1000.;
 Puzzle puzzle;
@@ -72,6 +73,12 @@ void endgame(void* data)
 {
 	ingame = false;
 	showmenu(mainmenu);
+}
+
+void endgame2(void* data)
+{
+	endgame(data);
+	dead = false;
 }
 
 void startlevel(void* data)
@@ -138,9 +145,6 @@ void init()
 	gamequitmenu->add_option("Yes", &exit);
 	gamequitmenu->set_esc_option(0);
 
-	//TODO: in the future, this should be "showmenu(mainmenu)". Right now, I am defaulting it to just jump right into the game to make development easier (so you don't have to go through menus to test)
-	showmenu(NULL);
-
 	//teleporter sounds
 	load_sound_in_group("data/teleport1.wav", SOUND_GROUP_TELEPORT);
 	load_sound_in_group("data/teleport2.wav", SOUND_GROUP_TELEPORT);
@@ -151,11 +155,34 @@ void init()
 	load_sound_in_group("data/menuselect.wav", SOUND_GROUP_MENU_SELECT);
 	load_sound_in_group("data/showmenu.wav", SOUND_GROUP_MENU_SHOW);
 	
-	//sound for changing menu
-	//load_sound_in_group("data/teleport3.wav", SOUND_GROUP_MENU_CHANGE);*/
+	//button sounds
+	load_sound_in_group("data/button1.wav", SOUND_GROUP_BUTTON);
+	load_sound_in_group("data/button2.wav", SOUND_GROUP_BUTTON);
+	load_sound_in_group("data/button3.wav", SOUND_GROUP_BUTTON);
+	load_sound_in_group("data/button4.wav", SOUND_GROUP_BUTTON);
+	
+	//gate closing
+	load_sound_in_group("data/gateclose.wav", SOUND_GROUP_GATE_CLOSE);
+	
+	//bounce
+	load_sound_in_group("data/bounce1.wav", SOUND_GROUP_BOUNCE);
+	//load_sound_in_group("data/bounce2.wav", SOUND_GROUP_BOUNCE);
+	load_sound_in_group("data/bounce3.wav", SOUND_GROUP_BOUNCE);
+	load_sound_in_group("data/bounce4.wav", SOUND_GROUP_BOUNCE);
+	load_sound_in_group("data/bounce5.wav", SOUND_GROUP_BOUNCE);
+	
+	//death
+	load_sound_in_group("data/death.wav", SOUND_GROUP_DEATH);
+	
+	//ticking
+	load_sound_in_group("data/tick_low.wav", SOUND_GROUP_TICK_LOW);
+	load_sound_in_group("data/tick_high.wav", SOUND_GROUP_TICK_HIGH);
 	
 	//initialize level data
-	puzzle.setup(get_level(start_level));
+	if(start_level != -1)
+		startlevel((void*)start_level);
+	else
+		showmenu(mainmenu);
 }
 
 bool togglekey(int GLFWKey, int menukey)
@@ -263,6 +290,12 @@ void draw() {
 	
 	//draw text as white
 	glColor3f(1, 1, 1);
+	
+	if(dead)
+	{
+		float size = 0.1;
+		
+	}
 	
 	/*show_text("Normal Text!", 0, 0, 0.05, TEXT_STYLE_NORMAL);
 	show_text("Bold Text!", 0, 0.05, 0.05, TEXT_STYLE_BOLD);

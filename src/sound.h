@@ -16,7 +16,13 @@
 #define SOUND_GROUP_MENU_CHANGE 1
 #define SOUND_GROUP_MENU_SELECT 2
 #define SOUND_GROUP_MENU_SHOW 3
-#define SOUND_GROUP_LAST 4
+#define SOUND_GROUP_BUTTON 4
+#define SOUND_GROUP_GATE_CLOSE 5
+#define SOUND_GROUP_BOUNCE 6
+#define SOUND_GROUP_DEATH 7
+#define SOUND_GROUP_TICK_LOW 8
+#define SOUND_GROUP_TICK_HIGH 9
+#define SOUND_GROUP_LAST 10
 
 int initialize_sound_driver();
 bool set_sound_format(int freq, bool stereo);
