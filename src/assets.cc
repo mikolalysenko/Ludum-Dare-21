@@ -35,6 +35,7 @@ namespace Assets {
 #include "levels/level1.h"
 #include "levels/level2.h"
 #include "levels/level3.h"
+#include "levels/level4.h"
 
 //Artwork
 #include "artwork/player_art.h"
@@ -68,6 +69,7 @@ void init_assets() {
 		level_database[1] = new Level1();
 		level_database[2] = new Level2();
 		level_database[3] = new Level3();
+		level_database[4] = new Level4();
 	}
 
 	//Create player artwork
