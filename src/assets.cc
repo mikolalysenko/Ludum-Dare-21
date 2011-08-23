@@ -40,6 +40,7 @@ namespace Assets {
 //Artwork
 #include "artwork/player_art.h"
 #include "artwork/spikeball.h"
+#include "artwork/prisimgate.h"
 
 };
 
@@ -76,6 +77,7 @@ void init_assets() {
 	{
 		artwork_database["player_model"] = make_player();
 		artwork_database["spikeball"] = make_spikeball();
+		artwork_database["prisimgate"] = make_prisimgate();
 	}
 }
 
