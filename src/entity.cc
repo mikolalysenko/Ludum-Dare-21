@@ -10,6 +10,7 @@
 #include "entity.h"
 #include "sound.h"
 #include "text.h"
+#include "assets.h"
 
 using namespace std;
 using namespace Eigen;
@@ -196,20 +197,29 @@ void ButtonEntity::tick(float dt) {
 }
 
 void ButtonEntity::draw() {
-	glDisable(GL_LIGHTING);
 
-	auto p = coordinate.position + coordinate.interpolated_normal() * 0.25;
-	glPointSize(10);
-	glBegin(GL_POINTS);
-	if(pressed) {
-		glColor3f(0, 1, 0);
-	} else {
-		glColor3f(1, 0, 0);
+	auto solid = get_artwork(pressed ? "button_on" : "button_off");
+	
+	glPushMatrix();
+
+	auto n = coordinate.interpolated_normal();	
+	auto p = coordinate.position + n * 0.1;
+	
+	glTranslatef(p[0], p[1], p[2]);
+	
+	
+	auto r = n.cross(Vector3f(0, 0, 1));
+	float m = r.norm();
+	if(m) {
+		float v = -asin(m);
+		r /= m;
+		glRotatef(v*180./M_PI, r[0], r[1], r[2]);
 	}
-	glVertex3f(p[0], p[1], p[2]);
-	glEnd();
-
-	glEnable(GL_LIGHTING);
+	
+	glScalef(0.5, 0.5, 1);
+	
+	solid->draw();
+	glPopMatrix();	
 }
 
 //Obstacle-----------------------------------------
