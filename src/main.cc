@@ -26,10 +26,12 @@ using namespace Mesh;
 namespace App {
 
 int start_level = -1;
+int cur_level = -1;
 
 bool running = true;
 bool ingame = false;
 bool dead = false;
+bool winner = false;
 
 double fov=45., znear=1., zfar=1000.;
 Puzzle puzzle;
@@ -69,6 +71,25 @@ void showmenu(void* data)
 		currentmenu->reset();
 }
 
+int getlevelindex(int i)
+{
+	switch(i)
+	{
+		case 0:
+			return 0;
+		case 1:
+			return 3;
+		case 2:
+			return 4;
+		case 3:
+			return 2;
+		case 4:
+			return 1;
+	}
+	
+	return 0;
+}
+
 void endgame(void* data)
 {
 	ingame = false;
@@ -86,8 +107,10 @@ void startlevel(void* data)
 	int lev = (int)data;
 
 	dead = false;
+	winner = false;
+	cur_level = lev;
 	
-	puzzle.setup(get_level(lev));
+	puzzle.setup(get_level(getlevelindex(lev)));
 	ingame = true;
 	
 	showmenu(NULL);
@@ -255,7 +278,13 @@ void tick()
 		puzzle.tick(dt);
 		
 		if(puzzle.level_complete) {
-			endgame(NULL);
+			if(cur_level < 4)
+				startlevel((void*)(cur_level + 1));
+			else
+			{
+				winner = true;
+				endgame(NULL);
+			}
 		}
 	}
 }
@@ -293,32 +322,13 @@ void draw() {
 	//draw text as white
 	glColor3f(1, 1, 1);
 	
-	if(dead)
+	if(winner)
 	{
 		float size = 0.1;
-		const char* text = "You are dead!";
+		const char* text = "You Escaped!";
 		
 		show_text(text, (1 - text_width(text, size)) / 2, 0.8, size, TEXT_STYLE_NORMAL);
 	}
-	
-	/*show_text("Normal Text!", 0, 0, 0.05, TEXT_STYLE_NORMAL);
-	show_text("Bold Text!", 0, 0.05, 0.05, TEXT_STYLE_BOLD);
-	show_text("Italic Text!", 0, 0.1, 0.05, TEXT_STYLE_ITALIC);
-	show_text("Bold and Italic Text!", 0, 0.15, 0.05, TEXT_STYLE_BOLD_AND_ITALIC);
-	show_text("Small Text!", 0, 0.2, 0.02);
-	show_text("Big Text!", 0, 0.22, 0.08);
-	
-	show_text("Right Text!", 1 - text_width("Right Text!", 0.05), .5, 0.05, TEXT_STYLE_NORMAL);
-	show_text("Center Text!", (1 - text_width("Center Text!", 0.05)) / 2, .95, 0.05, TEXT_STYLE_NORMAL);
-	
-	char allstr[96];
-	
-	for(int x = 0; x < 95; x++)
-		allstr[x] = x + 32;
-
-	allstr[95] = '\0';
-	
-	show_text(allstr, 0, 0.8, 0.02);*/
 	
 	if(currentmenu != NULL)
 		currentmenu->render();
