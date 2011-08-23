@@ -41,6 +41,8 @@ namespace Assets {
 #include "artwork/player_art.h"
 #include "artwork/spikeball.h"
 #include "artwork/prisimgate.h"
+#include "artwork/torus.h"
+#include "artwork/button.h"
 
 };
 
@@ -78,6 +80,9 @@ void init_assets() {
 		artwork_database["player_model"] = make_player();
 		artwork_database["spikeball"] = make_spikeball();
 		artwork_database["prisimgate"] = make_prisimgate();
+		artwork_database["torus"] = make_torus();
+		artwork_database["button_on"] = make_button_on();
+		artwork_database["button_off"] = make_button_off();
 	}
 }
 

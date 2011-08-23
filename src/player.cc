@@ -94,6 +94,8 @@ void clip_camera(
 	Solid* s,
 	Affine3f const& transform) {
 
+	
+
 	auto tinv = transform.inverse();
 	auto q = tinv * local_position;
 	auto p = tinv * camera_position;
@@ -180,7 +182,7 @@ void Player::tick(float dt) {
 	//Keep camera from colliding with obstacles
 	for(int i=0; i<puzzle->entities.size(); ++i) {
 		auto entity = dynamic_cast<ObstacleEntity*>(puzzle->entities[i]);
-		if(entity != NULL) {
+		if(entity != NULL && entity->active()) {
 			clip_camera(p, camera_position, entity->model, entity->transform);
 		}
 	}
