@@ -23,6 +23,13 @@ float cone(Vector3f const& v,
 	return a*a*rad2 - b;
 }
 
+float box(Vector3f const& v, float width, float height, float depth)
+{
+	if(v[0] > -width && v[0] < width && v[1] > -height && v[1] < height && v[2] > -depth && v[2] < depth)
+		return 1;
+	
+	return -1;
+}
 
 float bicone(Vector3f const& v, 
 	Vector3f const& axis, 
