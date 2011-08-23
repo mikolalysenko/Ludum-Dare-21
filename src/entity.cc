@@ -268,8 +268,7 @@ void ObstacleEntity::init() {
 }
 
 void ObstacleEntity::tick(float dt) {
-	if((flags & OBSTACLE_NO_COLLIDE) ||
-		!active()) {
+	if(!active()) {
 		return;
 	}
 	
@@ -284,6 +283,9 @@ void ObstacleEntity::tick(float dt) {
 	}
 	
 	if(process_collision(&puzzle->player.particle, dt)) {
+	
+		cout << "HERE?" << endl;
+	
 		//Kill the player if we are deadly!
 		if(flags & OBSTACLE_DEADLY) {
 			puzzle->kill_player();
@@ -303,7 +305,7 @@ void ObstacleEntity::draw() {
 }
 
 bool ObstacleEntity::process_collision(Particle* part, float dt) {
-	
+
 	auto tinv = transform.inverse();
 	auto npos = tinv * part->center();
 	auto grad = (transform.linear() * model->gradient(npos)).normalized();
