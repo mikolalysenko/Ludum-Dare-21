@@ -49,3 +49,23 @@ float max_list(vector<float> const& l) {
 	return m;
 }
 
+
+Vector4f color_interp(vector<Vector4f, Eigen::aligned_allocator<Vector4f> > const& colors, float t) {
+	if(t < 0)
+		return colors.front();
+
+	for(int i=1; i<colors.size(); ++i) {
+		
+		if(t >= colors[i][3]) {
+			t -= colors[i][3];		
+			continue;
+		}
+		
+		t /= colors[i][3];
+		return (1.-t)*colors[i-1] + t*colors[i];
+	}
+	
+	return colors.back();
+}
+
+

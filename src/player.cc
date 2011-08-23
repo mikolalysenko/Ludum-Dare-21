@@ -226,31 +226,5 @@ void Player::draw() {
 	glScalef(2*particle.radius,2*particle.radius,2*particle.radius);
 	model->draw();
 	glPopMatrix();
-	
-	if(button_pressed) {
-		glDisable(GL_DEPTH_TEST);
-		glBegin(GL_LINES);
-
-		glColor3f(1, 0, 0);
-		glVertex3f(p[0], p[1], p[2]);
-		auto fu = p + force_up;
-		glVertex3f(fu[0], fu[1], fu[2]);
-	
-		glColor3f(0, 0, 1);
-		glVertex3f(p[0], p[1], p[2]);
-		auto fr = p + force_right;
-		glVertex3f(fr[0], fr[1], fr[2]);
-
-		glColor3f(0, 1, 0);
-		glVertex3f(p[0], p[1], p[2]);
-		Vector2f dmouse(
-			2.f * (mouse_state[1][0] - (float)viewport[0]) / (float)viewport[2] - 1.f,
-			2.f * (mouse_state[1][1] - (float)viewport[1]) / (float)viewport[3] - 1.f);	
-		auto f = p + dmouse[0] * force_right - dmouse[1] * force_up;
-		glVertex3f(f[0], f[1], f[2]);
-	
-		glEnd();
-		glDisable(GL_DEPTH_TEST);
-	}
 }
 
