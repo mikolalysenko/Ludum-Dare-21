@@ -284,8 +284,6 @@ void ObstacleEntity::tick(float dt) {
 	
 	if(process_collision(&puzzle->player.particle, dt)) {
 	
-		cout << "HERE?" << endl;
-	
 		//Kill the player if we are deadly!
 		if(flags & OBSTACLE_DEADLY) {
 			puzzle->kill_player();

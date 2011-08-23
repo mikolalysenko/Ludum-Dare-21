@@ -48,7 +48,7 @@ struct Level1 : public PuzzleGenerator {
 		
 		//Create start/end location
 		auto start_pt = level->closest_point(Vector3f(0, 36, 0));
-		puzzle->add_entity(new LevelStartEntity(start_pt, 50));
+		puzzle->add_entity(new LevelStartEntity(start_pt));
 		
 		auto end_pt = level->closest_point(Vector3f(0, 0, 18));		
 		puzzle->add_entity(new LevelExitEntity(end_pt));
@@ -82,6 +82,7 @@ struct Level1 : public PuzzleGenerator {
 		button);
 		puzzle->add_entity(obstacle2);
 		
+		/*
 		puzzle->add_entity(spike_monster(
 			level->closest_point(Vector3f( -18, 18, 0))));
 			
@@ -90,6 +91,7 @@ struct Level1 : public PuzzleGenerator {
 			
 		puzzle->add_entity(spike_monster(
 			level->closest_point(Vector3f( 0, 10, 0))));
+		*/
 	}
 };
 

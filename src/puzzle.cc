@@ -44,6 +44,9 @@ void Puzzle::init() {
 	
 	//Reset level time
 	elapsed_time = 0.f;
+	
+	//Set initial camera position
+	player.target_position = player.camera_position = player.particle.center();	
 }
 
 //Handle input event
