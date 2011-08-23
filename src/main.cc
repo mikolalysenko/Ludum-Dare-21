@@ -136,7 +136,7 @@ void init()
 	levelmenu = new Menu("Level Select");
 	optionsmenu = new Menu("Options");
 	
-	mainmenu->add_option("Level Select", &showmenu, levelmenu);
+	mainmenu->add_option("New Game", &startlevel, (void*)0);
 	//mainmenu->add_option("Options", &showmenu, optionsmenu);
 	mainmenu->add_option("Exit", &showmenu, quitmenu);
 	mainmenu->set_esc_option(1);
