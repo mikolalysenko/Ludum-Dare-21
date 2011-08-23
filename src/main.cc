@@ -85,6 +85,8 @@ void startlevel(void* data)
 {
 	int lev = (int)data;
 
+	dead = false;
+	
 	puzzle.setup(get_level(lev));
 	ingame = true;
 	
@@ -136,7 +138,7 @@ void init()
 	gamequitmenu = new Menu("Really quit?");
 
 	gamemenu->add_option("Return to game", &showmenu, NULL);
-	gamemenu->add_option("End game", &endgame);
+	gamemenu->add_option("End game", &endgame2);
 	gamemenu->add_option("Exit", &showmenu, gamequitmenu);
 	gamemenu->set_esc_option(0);
 
@@ -294,7 +296,9 @@ void draw() {
 	if(dead)
 	{
 		float size = 0.1;
+		const char* text = "You are dead!";
 		
+		show_text(text, (1 - text_width(text, size)) / 2, 0.8, size, TEXT_STYLE_NORMAL);
 	}
 	
 	/*show_text("Normal Text!", 0, 0, 0.05, TEXT_STYLE_NORMAL);
