@@ -5,7 +5,7 @@ struct Level4Solid0 {
 		Cell result;
 		
 		result.density = torus(v, 20, 5*5);
-		result.friction = 1.0/4.0;
+		result.friction = (v[2] < 0 ? 0.01 : 1.0/4.0);
 		
 		return result;
 	}
