@@ -46,7 +46,7 @@ void Puzzle::init() {
 	elapsed_time = 0.f;
 	
 	//Set initial camera position
-	player.target_position = player.camera_position = player.particle.center();	
+	player.target_position = player.camera_position = player.particle.center() + player.particle.coordinate.interpolated_normal() * player.camera_height;	
 }
 
 //Handle input event

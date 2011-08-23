@@ -82,7 +82,6 @@ struct Level1 : public PuzzleGenerator {
 		button);
 		puzzle->add_entity(obstacle2);
 		
-		/*
 		puzzle->add_entity(spike_monster(
 			level->closest_point(Vector3f( -18, 18, 0))));
 			
@@ -91,7 +90,6 @@ struct Level1 : public PuzzleGenerator {
 			
 		puzzle->add_entity(spike_monster(
 			level->closest_point(Vector3f( 0, 10, 0))));
-		*/
 	}
 };
 
