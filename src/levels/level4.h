@@ -104,10 +104,10 @@ struct Level4 : public PuzzleGenerator {
 
 		
 		//Create start/end location
-		auto start_pt = part0->closest_point(Vector3f(-30, 0, -30));
+		auto start_pt = part0->closest_point(Vector3f(-20, 0, -30));
 		puzzle->add_entity(new LevelStartEntity(start_pt));
 		
-		auto end_pt = part0->closest_point(Vector3f(30, 0, -30));
+		auto end_pt = part0->closest_point(Vector3f(20, 0, -30));
 		puzzle->add_entity(new LevelExitEntity(end_pt));
 		
 
@@ -120,9 +120,15 @@ struct Level4 : public PuzzleGenerator {
 			
 		puzzle->add_entity(button);
 		
+		auto xform = Affine3f::Identity();
+		xform.translate(Vector3f(20, 0, -6));
+		xform.scale(1.1);
 		
-		
-		
+		puzzle->add_entity(new ObstacleEntity(
+			get_artwork("torus"),
+			xform,
+			0,
+			button)); 
 	}
 };
 
